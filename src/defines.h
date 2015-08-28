@@ -41,6 +41,13 @@
 
 #define     FloorFromID( ID )       ( (ID)/10000 )
 
+#define     GetTips( ID )           (    ID == TurnLeft ? "左转": \
+                                        (ID == TurnRight ? "右转": \
+                                        (ID == WalkDirect? "直行" : \
+                                        (ID == WalkAlong ? "继续沿路行走" : \
+                                        (ID == Arrive ? "到达":""))))   \
+                                    )
+
 using namespace std;
 
 typedef double  real;
