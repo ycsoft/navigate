@@ -39,7 +39,7 @@ extern "C"
     /// \return
     ///
     ///
-    PointArray      getBestPath(NavPoint *start, NavPoint *end);
+    PointArray getBestPath(NavPoint *start, NavPoint *end);
 
 }
 
