@@ -168,8 +168,10 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     _start = start;
     _end = end;
 
-    Node *start_2 = GetNearPathNode(start);
-    Node *end_2 = GetNearPathNode(end);
+    Node *start_2 = start;//GetNearPathNode(start);
+    Node *end_2 = end;//GetNearPathNode(end);
+
+    list<Node*>  endNeighbor = GetNeighbor(end);
 
     list<Node*> neighbor = GetNeighbor(start_2);
     list<Node*>::iterator iter = neighbor.begin();
@@ -181,7 +183,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     AddToCloseList( start_2 );
     Node *nstart = start_2;
     //memcpy(&nstart,start,sizeof(Node));
-    while ( !IsInPath(_closeList,end_2) )
+    while ( !IsInPath(_closeList,end_2) && !IsInPath(endNeighbor,_closeList.front()))
     {
         if ( _openList.empty())
         {
@@ -193,6 +195,10 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
         nstart = min_nd;
         AddToCloseList(min_nd);
         RemoveFromOpenList(min_nd);
+        if ( IsInPath(endNeighbor,min_nd) )
+        {
+            break;
+        }
         //检查并更新该点邻域数值
         list<Node*> newneighbor = GetNeighbor(min_nd);
         list<Node*> ::iterator nbiter = newneighbor.begin();
