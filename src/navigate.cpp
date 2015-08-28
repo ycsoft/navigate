@@ -80,7 +80,7 @@ void Navigate::LoadPointsFile(const char *file)
     //二进制文件读取
     FILE *f = fopen(file,"rb");
     char buf[32] = {0};
-    int floorcount = 0;
+    int floorcount = 0,k = 0;
 
     if ( NULL == f )
         return;
@@ -93,7 +93,7 @@ void Navigate::LoadPointsFile(const char *file)
     if ( floorcount <= 0) return;
 
     //for 楼层
-    for ( int k = 0 ; k < floorcount; ++k)
+    for ( k = 0 ; k < floorcount;k++)
     {
         int count = 0, floor = 0;
         //楼层编号
@@ -127,6 +127,7 @@ void Navigate::LoadPointsFile(const char *file)
             int nbcount;
             fread(&nbcount,sizeof(int),1,f);
             toBigEndian(nbcount);
+            nd->neighborcount = nbcount;
             nd->neigbours.resize(nbcount);
             for ( int j = 0 ; j < nbcount; ++j)
             {
@@ -381,10 +382,14 @@ void Navigate::UpdateDirect(list<Node *> &path)
         {
             nd2->attr = TurnLeft;
         }else
+        {
             nd2->attr = WalkDirect;
+        }
 
         if ( nd2->neighborcount <= 2)
+        {
             nd2->attr = WalkAlong;
+        }
 
         nd1 = nd2;
         nd2 = nd3;
