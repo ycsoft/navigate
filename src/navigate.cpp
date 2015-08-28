@@ -176,11 +176,9 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     for ( ; iter != neighbor.end(); ++iter)
     {
-        AddToOpenList( start,*iter );
+        AddToOpenList( start_2,*iter );
     }
-    AddToCloseList( start );
-
-
+    AddToCloseList( start_2 );
     Node *nstart = start_2;
     //memcpy(&nstart,start,sizeof(Node));
     while ( !IsInPath(_closeList,end_2) )
@@ -234,15 +232,15 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     }
     Node *nd = _closeList.front();
     result.push_front(end);
-    while ( (*nd)!=(*start) )
+    while ( (*nd)!=(*start_2) )
     {
         result.push_front(nd->parent);
         nd = nd->parent;
     }
-//    if ( start_2 != start )
-//    {
-//        result.push_front(start);
-//    }
+    if ( start_2 != start )
+    {
+        result.push_front(start);
+    }
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
@@ -352,6 +350,7 @@ Node* Navigate::GetMiniFNode(Node *cur)
         {
             flag = true;
             minf = f;
+//            res->parent = cur;
             res = (*iter);
         }
     }
@@ -383,12 +382,15 @@ void Navigate::UpdateDirect(list<Node *> &path)
 
         Vec v12(nd2->x - nd1->x, nd2->y - nd1->y),
             v13(nd3->x - nd1->x, nd3->y - nd1->y);
+        Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
+
+        real angle = VectorAngle(&v12,&v23);
 
         real cross = VectorCrossMulti(&v12,&v13);
-        if ( cross < 0)
+        if ( angle > 15 && cross < 0)
         {
             nd2->attr = TurnRight;
-        }else if ( cross > 0 )
+        }else if ( angle > 15 && cross > 0 )
         {
             nd2->attr = TurnLeft;
         }else

@@ -109,7 +109,23 @@ protected:
     Node *GetMiniFNode(Node *cur);
     real VectorCrossMulti(Vec *v1, Vec *v2)
     {
-        return ( v1->x * v2->y - v2->x * v1->y) * _coordsys;
+        real cros = ( v1->x * v2->y - v2->x * v1->y) * _coordsys;
+        return cros;
+    }
+
+
+    real VecMol(Vec *v)
+    {
+        return sqrt( v->x * v->x + v->y*v->y );
+    }
+
+    real VectorAngle(Vec *v1, Vec *v2)
+    {
+        real beta = acos((v1->x*v2->x + v1->y*v2->y)/(VecMol(v1)*VecMol(v2)));
+        beta = beta/3.1415926*180.0;
+
+        beta = beta > 0 ? beta: (180 + beta);
+        return beta;
     }
 
     //得到与选定点距离最近的路径点
