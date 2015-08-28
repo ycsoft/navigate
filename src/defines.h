@@ -19,7 +19,10 @@
 #define     WalkAlong               6   //沿弯路继续前行
 
 
-#define     Arrive                  11
+#define     Arrive                  11  //到达
+
+#define     UpStairs                12  //到楼上
+#define     DownStairs              -12  //到楼下
 
 
 #define     RightHandSys            1
