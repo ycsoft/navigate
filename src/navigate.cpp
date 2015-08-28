@@ -237,17 +237,16 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 //        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
     }
     Node *nd = _closeList.front();
-    result.push_front(end);
+    if ( nd != end )
+    {
+        result.push_front(end);
+    }
     while ( (*nd)!=(*start_2) )
     {
         result.push_front(nd);
         nd = nd->parent;
     }
     result.push_front(start_2);
-    if ( start_2 != start )
-    {
-        result.push_front(start);
-    }
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
