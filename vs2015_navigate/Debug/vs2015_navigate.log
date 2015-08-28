@@ -1,4 +1,4 @@
-﻿生成启动时间为 2015/8/28 15:00:12。
+﻿生成启动时间为 2015/8/28 21:26:49。
      1>项目“E:\wkcode\github\navigate\vs2015_navigate\vs2015_navigate.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\navigate.cpp
@@ -15,4 +15,4 @@
 
 已成功生成。
 
-已用时间 00:00:01.67
+已用时间 00:00:01.20
