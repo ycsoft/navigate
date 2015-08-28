@@ -43,7 +43,7 @@ int main()
 
         for ( int i = 0 ; i < 10; i++)
         {
-            test(30031,30088);
+            test(30031,30051);
             cout<<endl;
         }
     return 0;
