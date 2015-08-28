@@ -14,8 +14,8 @@ int main()
         //加载地图路径点文件
         nav.LoadPointsFile("../data/mg.i2");
         //设置导航起点与终点
-        Node *start = nav.GetPoint(30001); //根据ID获取点
-        Node *end = nav.GetPoint(30032);
+        Node *start = nav.GetPoint(30031); //根据ID获取点
+        Node *end = nav.GetPoint(30038);
         //获取路径
         list<Node*> path  = nav.GetBestPath(start,end);
         path = nav.GetBestPath(start,end);
