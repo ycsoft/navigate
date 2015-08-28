@@ -234,9 +234,10 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     result.push_front(end);
     while ( (*nd)!=(*start_2) )
     {
-        result.push_front(nd->parent);
+        result.push_front(nd);
         nd = nd->parent;
     }
+    result.push_front(start_2);
     if ( start_2 != start )
     {
         result.push_front(start);
