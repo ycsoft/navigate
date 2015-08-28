@@ -15,7 +15,7 @@ int main()
         nav.LoadPointsFile("../data/mg.i2");
         //设置导航起点与终点
         Node *start = nav.GetPoint(30001); //根据ID获取点
-        Node *end = nav.GetPoint(30044);
+        Node *end = nav.GetPoint(30032);
         //获取路径
         list<Node*> path  = nav.GetBestPath(start,end);
         path = nav.GetBestPath(start,end);
@@ -24,9 +24,7 @@ int main()
         cout<<"最佳路径:"<<endl;
         while ( iter != path.end())
         {
-
-            cout<<"[ "<<(*iter)->x<<","<<(*iter)->y<<" ,turn:"<<(*iter)->attr<<",ID:"<<(*iter)->id<<" ]";
-            cout<<" --> ";
+            cout<<(*iter)->id<<"    "<<GetTips((*iter)->attr)<<endl;
             ++iter;
         }
         cout<<endl;
