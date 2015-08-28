@@ -93,7 +93,7 @@ void Navigate::LoadPointsFile(const char *file)
     if ( floorcount <= 0) return;
 
     //for 楼层
-    for ( int k = 0 ; k < floorcount; ++k);
+    for ( int k = 0 ; k < floorcount; ++k)
     {
         int count = 0, floor = 0;
         //楼层编号
