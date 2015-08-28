@@ -151,8 +151,11 @@ void Navigate::LoadPointsFile(const char *file)
 list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 {
     ClearResult();
+
     bool    bfinded = true;
     list<Node*> result;
+    if ( start == NULL || end == NULL )
+        return result;
     //起点终点相同，不予导航
     if ( EQUAL(start->x , end->x) && EQUAL(start->y,end->y))
         return result;
@@ -162,13 +165,13 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     assert(start != NULL && end != NULL);
 
-    start = GetNearPathNode(start);
-    end = GetNearPathNode(end);
-
     _start = start;
     _end = end;
 
-    list<Node*> neighbor = GetNeighbor(start);
+    Node *start_2 = GetNearPathNode(start);
+    Node *end_2 = GetNearPathNode(end);
+
+    list<Node*> neighbor = GetNeighbor(start_2);
     list<Node*>::iterator iter = neighbor.begin();
 
     for ( ; iter != neighbor.end(); ++iter)
@@ -178,9 +181,9 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     AddToCloseList( start );
 
 
-    Node *nstart = start;
+    Node *nstart = start_2;
     //memcpy(&nstart,start,sizeof(Node));
-    while ( !IsInPath(_closeList,end) )
+    while ( !IsInPath(_closeList,end_2) )
     {
         if ( _openList.empty())
         {
@@ -238,7 +241,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
         result.push_front(nd->parent);
         nd = nd->parent;
     }
-    //result.push_front(start);
+    result.push_front(start);
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
@@ -246,41 +249,47 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 }
 
 
+
+void Navigate::AddToCloseList(Node *center)
+{
+//    Node *nd = new Node;
+
+//    memcpy(nd,center,sizeof(Node));
+//    nd->parent = center->parent;
+//    _closeList.push_front(nd);
+    _closeList.push_front(center);
+}
 //为尽可能简化程序，提高运行效率
 //该方法认为要添加的点在开放集中不存在，直接添加
 void Navigate::AddToOpenList(Node *parent,Node *center)
 {
-    Node *nd = new Node;
+//    Node *nd = new Node;
 
-    memcpy(nd,center,sizeof(Node));
-    nd->parent = parent;
-    _openList.push_front(nd);
+//    memcpy(nd,center,sizeof(Node));
+//    nd->parent = parent;
+//    _openList.push_front(nd);
+    center->parent = parent;
+    _openList.push_front(center);
 }
 
-void Navigate::AddToCloseList(Node *center)
-{
-    Node *nd = new Node;
-
-    memcpy(nd,center,sizeof(Node));
-    nd->parent = center->parent;
-    _closeList.push_front(nd);
-}
 
 void Navigate::ClearResult()
 {
-    list<Node*> ::iterator it1 = _openList.begin();
-    while ( it1 != _openList.end())
-    {
-        delete *it1;
-        it1 = _openList.erase(it1);
-    }
+    _openList.clear();
+    _closeList.clear();
+//    list<Node*> ::iterator it1 = _openList.begin();
+//    while ( it1 != _openList.end())
+//    {
+//        delete *it1;
+//        it1 = _openList.erase(it1);
+//    }
 
-    list<Node*> ::iterator it2 = _closeList.begin();
-    while ( it2!= _closeList.end() )
-    {
-        delete *it2;
-        it2 = _openList.erase(it2);
-    }
+//    list<Node*> ::iterator it2 = _closeList.begin();
+//    while ( it2!= _closeList.end() )
+//    {
+//        delete *it2;
+//        it2 = _closeList.erase(it2);
+//    }
 }
 
 real Navigate::GetGValue(Node *n1, Node *n2)
@@ -412,18 +421,46 @@ void Navigate::UpdateDirect(list<Node *> &path)
 
 Node *Navigate::GetNearPathNode(Node *nd)
 {
-    real mindis = INVALID;
     Node *res = NULL;
-    int i = 0, count = __points.size();
-    for ( i = 0 ; i < count; ++i)
+    if ( nd->type == Endian )
     {
-        real dis = Distance(nd,__points[i]);
-        if ( dis < mindis)
+        return nd;
+    }else
+    {
+        int nbcount = nd->neighborcount;
+        real mindis = INVALID;
+        for ( int i = 0 ; i < nbcount ; ++i)
         {
-            mindis = dis;
-            res = __points[i];
+            Node * nb = GetPoint(nd->neigbours[i]);
+            if ( nb->type != Endian )
+            {
+                continue;
+            }
+            real dis = Distance(nd,nb);
+            if ( dis < mindis )
+            {
+                mindis = dis;
+                res = nb;
+            }
         }
     }
+
+//    real mindis = INVALID;
+//    Node *res = NULL;
+//    int i = 0, count = __points.size();
+//    for ( i = 0 ; i < count; ++i)
+//    {
+//        if (__points[i]->type == Endian)
+//        {
+//            real dis = Distance(nd,__points[i]);
+//            if ( dis < mindis)
+//            {
+//                mindis = dis;
+//                res = __points[i];
+//            }
+//        }
+
+//    }
     return res;
 }
 

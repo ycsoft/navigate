@@ -30,14 +30,14 @@
 
 #define     Direct_Mask             0xffffffff
 
-#define     INVALID                 9999999.9f
+#define     INVALID                 999999999.9
 
 //用于浮点数比较
 #define     ZERO                    0.000001f
 #define     EQUAL(x,y)              (x - y <= ZERO && x - y >= 0-ZERO )
 
-#define     Distance(nx,ny)         ((nx->x - ny->x)*(nx->x - ny->x) \
-                                    +(nx->y - ny->y)*(nx->y - ny->y))
+#define     Distance(nx,ny)         sqrt(((nx->x - ny->x)*(nx->x - ny->x) \
+                                    +(nx->y - ny->y)*(nx->y - ny->y)))
 
 #define     FloorFromID( ID )       ( (ID)/10000 )
 
