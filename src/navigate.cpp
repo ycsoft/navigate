@@ -439,7 +439,7 @@ Node *Navigate::GetNearPathNode(Node *nd)
             {
                 continue;
             }
-            real dis = Distance(nd,nb);
+            real dis = Distance(_end,nb);
             if ( dis < mindis )
             {
                 mindis = dis;
