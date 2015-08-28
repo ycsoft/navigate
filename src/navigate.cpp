@@ -386,10 +386,10 @@ void Navigate::UpdateDirect(list<Node *> &path)
             nd2->attr = WalkDirect;
         }
 
-        if ( nd2->neighborcount <= 2)
-        {
-            nd2->attr = WalkAlong;
-        }
+//        if ( nd2->neighborcount <= 2)
+//        {
+//            nd2->attr = WalkAlong;
+//        }
 
         nd1 = nd2;
         nd2 = nd3;
