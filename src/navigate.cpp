@@ -228,7 +228,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     }
     else{
-        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
+//        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
     }
     Node *nd = _closeList.front();
     result.push_front(end);
@@ -439,7 +439,7 @@ Node *Navigate::GetNearPathNode(Node *nd)
             {
                 continue;
             }
-            real dis = Distance(nd,nb);
+            real dis = Distance(_end,nb);
             if ( dis < mindis )
             {
                 mindis = dis;
