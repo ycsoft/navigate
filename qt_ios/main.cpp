@@ -1,4 +1,4 @@
-﻿#include "navigatelib.h"
+﻿#include "../src/navigatelib.h"
 
 #include <iostream>
 

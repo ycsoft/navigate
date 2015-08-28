@@ -1,2 +1,2 @@
 # navigate
-Inner House Path Planning Algorithm
+Indoor Navigation Algorithm: Inner House Path Planning

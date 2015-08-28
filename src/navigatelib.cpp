@@ -50,6 +50,8 @@ PointArray  getBestPath(NavPoint *start, NavPoint *end)
         list<Node*>  tmppath = global_nav.GetBestPath(nstart,dest1),
                      tmppath2 = global_nav.GetBestPath(dest2,nend);
         list<Node*>::iterator it = tmppath.begin();
+        int  attr = (stfloor < edfloor ? 1:-1) * UpStairs;
+        tmppath.back()->attr = attr;
         while ( it != tmppath.end())
         {
             path.push_back(*it);
