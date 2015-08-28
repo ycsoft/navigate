@@ -18,12 +18,15 @@ DEFINES += NAVIGATELIB_LIBRARY
 #CONFIG -= qt
 
 
-SOURCES += navigatelib.cpp \
-    ../src/navigate.cpp
+SOURCES +=  \
+    main.cpp \
+    ../src/navigate.cpp \
+    ../src/navigatelib.cpp
 
-HEADERS += navigatelib.h \
+HEADERS += \
     ../src/defines.h \
-    ../src/navigate.h
+    ../src/navigate.h \
+    ../src/navigatelib.h
 
 unix {
     target.path = /usr/lib

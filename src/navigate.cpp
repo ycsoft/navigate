@@ -192,11 +192,9 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
         }
         //从开放集中获取最小F值的数据点并加入封闭集中
         Node *min_nd = GetMiniFNode(nstart);
-//        cout<<"Min Node:"<<min_nd->x<<" ,"<<min_nd->y<<end;
         nstart = min_nd;
         AddToCloseList(min_nd);
         RemoveFromOpenList(min_nd);
-
         //检查并更新该点邻域数值
         list<Node*> newneighbor = GetNeighbor(min_nd);
         list<Node*> ::iterator nbiter = newneighbor.begin();
@@ -241,7 +239,10 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
         result.push_front(nd->parent);
         nd = nd->parent;
     }
-    result.push_front(start);
+//    if ( start_2 != start )
+//    {
+//        result.push_front(start);
+//    }
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
