@@ -1,6 +1,6 @@
 ﻿//#include "defines.h"
 //#include "navigate.h"
-#include "navigatelib.h"
+#include "../src/navigatelib.h"
 #include "navigate_Navigate.h"
 #include "jlog.h"
 

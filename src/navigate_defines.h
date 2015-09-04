@@ -1,13 +1,10 @@
-﻿#ifndef DEFINES_H
-#define DEFINES_H
+﻿#ifndef NAVIGATE_DEFINES_H
+#define NAVIGATE_DEFINES_H
 
 #include <iostream>
 #include <cstdlib>
 #include <list>
 #include <vector>
-
-
-
 
 #define     ISEndian                1
 #define     NotEndian               0
@@ -39,20 +36,18 @@
 #define     Distance(nx,ny)         sqrt(((nx->x - ny->x)*(nx->x - ny->x) \
                                     +(nx->y - ny->y)*(nx->y - ny->y)))
 
-#define     FloorFromID( ID )       ( (ID)/10000 )
+#define     FloorFromID(ID)       ( (ID)/10000 )
 
-#define     GetTips( ID )           (    ID == TurnLeft ? "左转": \
+#define     GetTips(ID)           (ID == TurnLeft ? "左转": \
                                         (ID == TurnRight ? "右转": \
                                         (ID == WalkDirect? "直行" : \
                                         (ID == WalkAlong ? "继续沿路行走" : \
                                         (ID == Arrive ? "到达":""))))   \
-                                    )
+                                   )
 
 using namespace std;
 
-typedef double  real;
-
-
+typedef double real;
 typedef struct Node
 {
 	Node()
@@ -149,10 +144,8 @@ typedef struct Line
 
 typedef struct SortValue
 {
-	real key;
-	Node *res;
+    real key;
+    Node *res;
 }SortValue;
 
-
-
-#endif // DEFINES_H
+#endif // NAVIGATE_DEFINES_H

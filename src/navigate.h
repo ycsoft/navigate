@@ -1,11 +1,12 @@
 ﻿#ifndef NAVIGATE_H
 #define NAVIGATE_H
 
-#include "defines.h"
+#include "navigate_defines.h"
 
 #include <vector>
 #include <list>
 #include <map>
+#include <cmath>
 
 using namespace std;
 
@@ -30,7 +31,6 @@ public:
     ///
     ///
     list<Node*>  GetBestPath(Node *start, Node *end);
-
 
     ///
     /// \brief LoadPointsFile
@@ -107,12 +107,12 @@ protected:
     bool IsInPath(list<Node*> path, Node *nd);
     //从开放集中获取F值最小的数据点
     Node *GetMiniFNode(Node *cur);
+
     real VectorCrossMulti(Vec *v1, Vec *v2)
     {
         real cros = ( v1->x * v2->y - v2->x * v1->y) * _coordsys;
         return cros;
     }
-
 
     real VecMol(Vec *v)
     {
@@ -130,7 +130,6 @@ protected:
 
     //得到与选定点距离最近的路径点
     Node  *GetNearPathNode( Node *nd);
-
 
     //删除点
     void RemoveFromOpenList(Node *nd);

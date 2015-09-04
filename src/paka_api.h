@@ -1,7 +1,6 @@
 ﻿#ifndef NAVIGATELIB_H
 #define NAVIGATELIB_H
 
-
 typedef double real;
 
 typedef struct _Point

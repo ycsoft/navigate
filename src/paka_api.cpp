@@ -1,7 +1,7 @@
-﻿#include "navigatelib.h"
+﻿#include "paka_api.h"
 #include "navigate.h"
 
-#include "defines.h"
+#include "navigate_defines.h"
 
 #include <map>
 #include <list>
@@ -12,7 +12,7 @@ using namespace std;
 
 static Navigate global_nav;
 
-PointArray      loadPathInfo(const char *filepath)
+PointArray loadPathInfo(const char *filepath)
 {
     global_nav.LoadPointsFile(filepath);
     vector<Node*> res = global_nav.GetAllPoints();
@@ -35,7 +35,7 @@ PointArray      loadPathInfo(const char *filepath)
     return result;
 }
 
-PointArray  getBestPath(NavPoint *start, NavPoint *end)
+PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
     Node *nstart = global_nav.GetPoint(start->id)
          ,*nend = global_nav.GetPoint(end->id);
@@ -64,8 +64,10 @@ PointArray  getBestPath(NavPoint *start, NavPoint *end)
             ++it;
         }
     }
-    else
+    else {
         path = global_nav.GetBestPath(nstart,nend);
+    }
+
     PointArray result;
     result.num = path.size();
     result.pts = new NavPoint[result.num];
