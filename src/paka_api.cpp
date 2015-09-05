@@ -37,10 +37,10 @@ PointArray loadPathInfo(const char *filepath)
 
 PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
-    Node *nstart = global_nav.GetPoint(start->id)
-         ,*nend = global_nav.GetPoint(end->id);
-    int  stfloor = FloorFromID(start->id)
-            ,edfloor = FloorFromID(start->id);
+    Node *nstart = global_nav.GetPoint(start->id);
+    Node *nend = global_nav.GetPoint(end->id);
+    int stfloor = FloorFromID(start->id);
+    int edfloor = FloorFromID(start->id);
     list<Node*> path;
 
     if ( stfloor != edfloor )
@@ -64,7 +64,8 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
             ++it;
         }
     }
-    else {
+    else
+    {
         path = global_nav.GetBestPath(nstart,nend);
     }
 

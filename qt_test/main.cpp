@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <vector>
+#include <cstring>
 #include <list>
 
 
@@ -49,13 +50,43 @@ void test_navigate() {
     }
 }
 
-void test_wifi_location() {
+
+void test_wifi_location_read_file() {
     wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
 }
 
+
+void test_wifi_location_jduge_which_floor() {
+    InputFinger *f1 = new InputFinger("d0c7c06f7194", -54);
+    InputFinger *f2 = new InputFinger("147590e10142", -64);
+    InputFinger *f3 = new InputFinger("78d38dbcbc74", -64);
+    InputFinger *f4 = new InputFinger("bcd17750b46e", -67);
+    InputFinger *f5 = new InputFinger("a8574e0590c0", -69);
+    InputFinger *f6 = new InputFinger("a8ad3dc0f998", -70);
+    InputFinger *f7 = new InputFinger("78d38dbcbc78", -70);
+    InputFinger *f8 = new InputFinger("8089177e8038", -72);
+    InputFinger *f9 = new InputFinger("08107692b1a9", -73);
+    InputFinger *f10 = new InputFinger("e4d332bdad46", -73);
+    InputFinger *f11 = new InputFinger("ec26ca38f68e", -74);
+    InputFinger *f12 = new InputFinger("80891724fed8", -75);
+    InputFinger *f13 = new InputFinger("60bb0c1f38ec", -75);
+    InputFinger *f14 = new InputFinger("d4ee070f9736", -75);
+    InputFinger *f15 = new InputFinger("38e595b271a9", -76);
+
+    InputFinger** fingers = new InputFinger*[15] {
+          f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15
+    };
+    string floorcode =  wloc.LocationBuildingFloor(fingers, 15);
+    wloc.LocationFloorPoint(floorcode.c_str(), fingers, 15);
+}
+
+
+
+
 int main()
 {
-    test_wifi_location();
+    test_wifi_location_read_file();
+    test_wifi_location_jduge_which_floor();
     return 0;
 }
 

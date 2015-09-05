@@ -28,7 +28,6 @@ typedef struct Mac_List_Item_ST {
     }
 }MacListItem;
 
-
 typedef struct Gather_Finger_Item_ST {
     string mac;
     int rssi;
@@ -55,13 +54,12 @@ typedef struct Wifi_Floor_ST {
     int floor_number;
     map<string, MacListItem> all_mac_map;           // 所有的wifi map
     map< int, GatherFingerInfo > finger_map;        // 每个测量点的wifi指纹，key为测量点编号，value为测量点的wifi指纹
+    map<string, list<int> > mac_point_code_map;     // mac地址在哪些采集点曾出现过
 }FloorWifiInfo;
-
 
 /*
  * eror code defines
  */
-
 #define LOC_WIFI_ERR_FILE_OPEN_FAILED   -1
 #define LOC_WIFI_ERR_MAC_ID_INVALID     -2
 
