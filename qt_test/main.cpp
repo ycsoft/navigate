@@ -50,7 +50,7 @@ void test_navigate() {
 }
 
 void test_wifi_location() {
-    wloc.LoadWifiFile("/tmp/paka/SZ-XIANGNAN-AREA/XN-XNRF-SYZX/data/wfinger.f");
+    wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
 }
 
 int main()

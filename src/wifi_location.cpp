@@ -44,7 +44,7 @@ int WifiLocation::LoadWifiFile(const char *filepath)
     FILE *f = fopen(filepath,"rb");
     if (NULL == f)
     {
-        return -1;
+        return LOC_WIFI_ERR_FILE_OPEN_FAILED;
     }
 
     char _buf_32[32] = {0};
@@ -82,6 +82,8 @@ int WifiLocation::LoadWifiFile(const char *filepath)
         int _mac_id = 0;
         int _rssi_max = 0;
         int _rssi_max_point_code = 0;
+
+        map<int, string> _id_mac_map;
         for (int j = 0; j < _floor_mac_number; j++)
         {
             // mac序号
@@ -99,9 +101,9 @@ int WifiLocation::LoadWifiFile(const char *filepath)
 
             // 填充楼层wifi列表
             MacListItem item(_mac_id, _mac_string, _rssi_max, _rssi_max_point_code);
-            fwi.mac_list.push_back(item);
+            fwi.all_mac_map.insert(make_pair(_mac_string, item));
             // 写入mac与序号对应关系
-            fwi.id_mac_map.insert(make_pair(_mac_id, _mac_string));
+            _id_mac_map.insert(make_pair(_mac_id, _mac_string));
         }
 
         // 然后是每个采集点的信息
@@ -149,16 +151,25 @@ int WifiLocation::LoadWifiFile(const char *filepath)
                 fread(&_gather_mac_rssi, sizeof(int), 1, f);
                 toBigEndian(_gather_mac_rssi);
 
-                GatherFingerItem item(_gather_mac_id, _gather_mac_rssi);
-                finfo.fingers.push_back(item);
+                // 从mac序号中找mac地址
+                map<int, string>::iterator iter = _id_mac_map.find(_gather_mac_id);
+                if (iter == _id_mac_map.end())
+                {
+                    // 没有在序号中找到mac地址肯定是不对的
+                    m_building_wifi_info.clear();
+                    return LOC_WIFI_ERR_MAC_ID_INVALID;
+                }
+                string _gather_mac = iter->second;
+                GatherFingerItem item(_gather_mac, _gather_mac_rssi);
+                finfo.fingers_map.insert(make_pair(_gather_mac, item));
             }
             fwi.finger_map.insert(make_pair(_gather_point_code, finfo));
         }
-
         m_building_wifi_info.insert(make_pair(fwi.floor_code, fwi));
     }
     return 0;
 }
+
 
 
 

@@ -10,6 +10,7 @@ using namespace std;
 
 #define MAC_LENTH 12
 
+
 // 每层楼wifi列表的列表项结构体
 typedef struct Mac_List_Item_ST {
     int id;
@@ -29,33 +30,40 @@ typedef struct Mac_List_Item_ST {
 
 
 typedef struct Gather_Finger_Item_ST {
-    int id;
+    string mac;
     int rssi;
-    Gather_Finger_Item_ST(int _id, int _rssi) {
-        this->id = _id;
+    Gather_Finger_Item_ST(string _mac, int _rssi) {
+        this->mac = _mac;
         this->rssi = _rssi;
     }
-}GatherFingerItem;
+}GatherFingerItem, InputFinger;
 
 typedef struct Point_ST {
     int pcode;
     double x;
     double y;
-} WPoint;
+} LPoint;
 
 typedef struct Gather_Finger_Info_ST {
-    WPoint p;
-    list<GatherFingerItem> fingers;
+    LPoint p;
+    map<string, GatherFingerItem> fingers_map;
 } GatherFingerInfo;
 
 // used to store one wifi data of one floor
 typedef struct Wifi_Floor_ST {
     string floor_code;
     int floor_number;
-    list<MacListItem> mac_list;                     // 所有的wifi列表
+    map<string, MacListItem> all_mac_map;           // 所有的wifi map
     map< int, GatherFingerInfo > finger_map;        // 每个测量点的wifi指纹，key为测量点编号，value为测量点的wifi指纹
-    map<int, string> id_mac_map;                    // 辅助数据, 序号与mac对应关系
 }FloorWifiInfo;
+
+
+/*
+ * eror code defines
+ */
+
+#define LOC_WIFI_ERR_FILE_OPEN_FAILED   -1
+#define LOC_WIFI_ERR_MAC_ID_INVALID     -2
 
 
 #endif // WIFI_LOCATION_DEFINES_H
