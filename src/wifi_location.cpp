@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <algorithm>
+#include <cmath>
 
 #include "common.h"
 
@@ -277,17 +279,10 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
 
     FloorWifiInfo &floor_wifi_info = iter->second;
     set<int> possible_pcode_set = calPossiblePoints(fingers, size, floor_wifi_info.mac_point_code_map);
-    int possible_pcode = getMostSimilarPointCode(fingers, size, floor_wifi_info.finger_map, possible_pcode_set);
 
-    map< int, GatherFingerInfo >::iterator iter2 = floor_wifi_info.finger_map.find(possible_pcode);
-    if (iter2 == floor_wifi_info.finger_map.end())
-    {
-        // location error
-        return p;
-    }
+    vector<SPointTemp> sptl = getSimilarPointCodeList(fingers, size, floor_wifi_info.finger_map, possible_pcode_set);
 
-    GatherFingerInfo& ginfo = iter2->second;
-    p = calFloorPointLocation(fingers, size, ginfo);
+    p = calFloorPointLocation(sptl);
     return p;
 }
 
@@ -380,10 +375,102 @@ int WifiLocation::getMostSimilarPointCode(InputFinger* fingers[], int size, map<
     return most_simi_code;
 }
 
-
-// 得到最相似点后计算XY坐标
-LPoint WifiLocation::calFloorPointLocation(InputFinger* fingers[], int size, GatherFingerInfo& ginfo)
+/*!
+ * \brief 按照相似度排序函数
+ * \param v1
+ * \param v2
+ * \return
+ */
+bool SortBySimi( const SPointTemp &v1, const SPointTemp &v2)//注意：本函数的参数的类型一定要与vector中元素的类型一致
 {
-    return ginfo.p;
+    return v1.simi > v2.simi; //升序排列
 }
 
+/*!
+ * \brief 得到相似点列表，按照相似度排序
+ * \param fingers 传入的wifi data
+ * \param size input wifi data length
+ * \param finger_map 指纹map
+ * \param points 待比较的目标点
+ * \return
+ */
+vector<SPointTemp> WifiLocation::getSimilarPointCodeList(InputFinger* fingers[], int size, map< int, GatherFingerInfo > &finger_map, set<int> &points)
+{
+    vector<SPointTemp> fv;
+    set<int>::iterator iter = points.begin();
+    for ( ; iter != points.end(); ++iter)
+    {
+        int pcode = *iter;
+        map< int, GatherFingerInfo >::iterator iter2 = finger_map.find(pcode);
+        if (iter2 != finger_map.end())
+        {
+            GatherFingerInfo &info = iter2->second;
+            int simi = calSimilarityInFloorGatherCode(fingers, size, info);
+            SPointTemp spt;
+            spt.x = info.p.x;
+            spt.y = info.p.y;
+            spt.simi = simi;
+            spt.pcode = info.p.pcode;
+            fv.push_back(spt);
+        }
+    }
+    sort(fv.begin(), fv.end(), SortBySimi);
+    return fv;
+}
+
+
+/*!
+ * \brief 得到最相似点后计算XY坐标
+ * \param vecSpt 相似点，按相似度排序
+ * \return
+ */
+LPoint WifiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
+{
+    LPoint ret;
+    ret.pcode = -1;
+    if (vecSpt.size() == 0)
+    {
+        return ret;
+    }
+    // 取前三个点，求平均坐标，然后看平均坐标离哪个最近，则取最近的点
+    double sum_x = 0.0;
+    double sum_y = 0.0;
+    int count = 0;
+    for (int i= 0; i < vecSpt.size() && i < 3; ++i)
+    {
+        sum_x = sum_x + vecSpt[i].x;
+        sum_y = sum_y + vecSpt[i].y;
+        ++count;
+    }
+
+    double avg_x = sum_x / count;
+    double avg_y = sum_y / count;
+
+    SPointTemp mp;
+    double min = 99999.0f;
+    // 求两点间距离，得到最近距离，即为选取的点
+    for (int i = 0; i < count; ++i)
+    {
+        double x = vecSpt[i].x;
+        double y = vecSpt[i].y;
+
+        double dis = calTwoPointDistance(x, y, avg_x, avg_y);
+        if (dis < min)
+        {
+            min = dis;
+            mp = vecSpt[i];
+        }
+
+    }
+
+    ret.pcode = mp.pcode;
+    ret.x = mp.x;
+    ret.y = mp.y;
+    return ret;
+}
+
+// 计算两点距离
+double WifiLocation::calTwoPointDistance(double x1, double y1, double x2, double y2)
+{
+   return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}

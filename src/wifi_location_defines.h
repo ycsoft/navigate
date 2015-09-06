@@ -43,6 +43,14 @@ typedef struct Point_ST {
     double y;
 } LPoint;
 
+// 相似度排序的时候，用到的临时结构体
+typedef struct Point_Similar_Temp_ST {
+    int pcode;
+    double x;
+    double y;
+    int simi;
+} SPointTemp;
+
 typedef struct Gather_Finger_Info_ST {
     LPoint p;
     map<string, GatherFingerItem> fingers_map;

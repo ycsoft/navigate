@@ -52,7 +52,8 @@ void test_navigate() {
 
 
 void test_wifi_location_read_file() {
-    wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
+    //wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
+    wloc.LoadWifiFile("F:\\_temp\\wfinger.f");
 }
 
 

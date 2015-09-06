@@ -3,6 +3,7 @@
 
 #include <map>
 #include <set>
+#include <vector>
 #include <cstring>
 
 #include "wifi_location_defines.h"
@@ -47,10 +48,19 @@ private:
     set<int> calPossiblePoints(InputFinger* fingers[], int size, map<string, list<int> > &mac_point_code_map);
 
     // 得到最相似点
-    int getMostSimilarPointCode(InputFinger* fingers[], int size, map< int, GatherFingerInfo > &finger_map, set<int> &points);
+    int getMostSimilarPointCode(InputFinger* fingers[], int size,
+                                map< int, GatherFingerInfo > &finger_map, set<int> &points);
+
+    // 得到相似点列表，按照相似度排序
+    vector<SPointTemp> getSimilarPointCodeList(InputFinger* fingers[], int size,
+                                               map< int, GatherFingerInfo > &finger_map, set<int> &points);
 
     // 得到最相似点后计算XY坐标
-    LPoint calFloorPointLocation(InputFinger* fingers[], int size, GatherFingerInfo& ginfo);
+    LPoint calFloorPointLocation(vector<SPointTemp> vecSpt);
+
+private:
+    // 计算两点距离
+    inline double calTwoPointDistance(double x1, double y1, double x2, double y2);
 
 private:
     // 保存楼宇中每个楼层的wifi数据
