@@ -7,6 +7,8 @@
 #include "../src/navigate.h"
 #include "../src/wifi_location.h"
 
+#include "../src/paka_api.h"
+
 using namespace std;
 
 Navigate nav;
@@ -52,8 +54,8 @@ void test_navigate() {
 
 
 void test_wifi_location_read_file() {
-    //wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
-    wloc.LoadWifiFile("F:\\_temp\\wfinger.f");
+    wloc.LoadWifiFile("/home/bukp/temp/wfinger.f");
+    // wloc.LoadWifiFile("F:\\_temp\\wfinger.f");
 }
 
 
@@ -86,8 +88,12 @@ void test_wifi_location_jduge_which_floor() {
 
 int main()
 {
-    test_wifi_location_read_file();
-    test_wifi_location_jduge_which_floor();
+    //test_wifi_location_read_file();
+    //test_wifi_location_jduge_which_floor();
+    loadWifiInfo("/home/bukp/temp/wfinger.f");
+    const char* bssids = "d0c7c06f7194,-54;147590e10142,-64;78d38dbcbc74,-64;bcd17750b46e,-67;a8574e0590c0,-69;a8ad3dc0f998,-70;78d38dbcbc78,-70;8089177e8038,-72;08107692b1a9,-73;e4d332bdad46,-73;ec26ca38f68e,-74;80891724fed8,-75;60bb0c1f38ec,-75;d4ee070f9736,-75;38e595b271a9,-76;";
+    WifiPoint pp = doLocate(bssids);
+
     return 0;
 }
 

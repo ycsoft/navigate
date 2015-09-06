@@ -28,3 +28,13 @@ void  toBigEndian(int& x)
             | ((x & 0x00ff0000) >> 8) | ( (x & 0xff000000) >> 24);
 }
 
+/*!
+ * \brief 将楼层点编号，转换为楼宇全局编号
+ * \param floorCode
+ * \param floorNubmer
+ * \return
+ */
+int floorPCodeToGlobePCode(int floorCode, int floorNubmer)
+{
+    return GLOBAL_FLOOR_CODE_BASE * floorNubmer + floorCode;
+}

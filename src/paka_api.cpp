@@ -1,16 +1,20 @@
 ﻿#include "paka_api.h"
 #include "navigate.h"
-
+#include "wifi_location.h"
+#include "navigate_defines.h"
 #include "navigate_defines.h"
 
 #include <map>
 #include <list>
 #include <vector>
-#include <math.h>
+#include <cstring>
+#include <iostream>
+#include <cmath>
 
 using namespace std;
 
 static Navigate global_nav;
+static WifiLocation global_wifi;
 
 PointArray loadPathInfo(const char *filepath)
 {
@@ -84,5 +88,58 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         ++it;++i;
     }
     return result;
+}
 
+int loadWifiInfo(const char *filepath)
+{
+    return global_wifi.LoadWifiFile(filepath);
+}
+
+
+// split the string
+vector<string> split(string str, string pattern)
+{
+     string::size_type pos;
+     vector<string> result;
+     str += pattern;//扩展字符串以方便操作
+     size_t size=str.size();
+
+     for(size_t i = 0; i < size; i++)
+     {
+         pos = str.find(pattern,i);
+         if (pos < size)
+         {
+             std::string s=str.substr(i, pos-i);
+             result.push_back(s);
+             i = pos+pattern.size() - 1;
+         }
+     }
+     return result;
+}
+
+WifiPoint doLocate(const char* bssids)
+{
+    string bssidstr = bssids;
+    vector<string> macs = split(bssidstr, ";");
+    InputFinger** fingers = new InputFinger*[macs.size()];
+    int count = 0;
+    for (size_t i = 0; i < macs.size(); ++i)
+    {
+        string mac = macs[i];
+        vector<string> item = split(mac, ",");
+        if (item.size() == 2)
+        {
+            InputFinger* ff = new InputFinger(item[0], atoi(item[1].c_str()));
+            fingers[count] = ff;
+            count++;
+        }
+    }
+    string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
+    LPoint p = global_wifi.LocationFloorPoint(floor_code.c_str(), fingers, count);
+
+    WifiPoint pp;
+    pp.id = p.pcode;
+    pp.x = p.x;
+    pp.y = p.y;
+    return pp;
 }

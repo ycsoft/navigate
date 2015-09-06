@@ -283,6 +283,7 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
     vector<SPointTemp> sptl = getSimilarPointCodeList(fingers, size, floor_wifi_info.finger_map, possible_pcode_set);
 
     p = calFloorPointLocation(sptl);
+    p.pcode = floorPCodeToGlobePCode(p.pcode, floor_wifi_info.floor_number);
     return p;
 }
 

@@ -31,6 +31,9 @@ typedef struct Mac_List_Item_ST {
 typedef struct Gather_Finger_Item_ST {
     string mac;
     int rssi;
+    Gather_Finger_Item_ST() {
+        rssi = 0;
+    }
     Gather_Finger_Item_ST(string _mac, int _rssi) {
         this->mac = _mac;
         this->rssi = _rssi;
