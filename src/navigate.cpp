@@ -5,42 +5,7 @@
 #include <string.h>
 #include <cmath>
 
-#define  REAL_TYPE_SIZE  (sizeof(real))
-
-union charDouble
-{
-    char c[ REAL_TYPE_SIZE ];
-    real db;
-};
-
-/**
- * @brief toDouble
- * 转换double型数据的字节序
- *
- * @param x
- */
-void toDouble(real &x)
-{
-    charDouble cd;
-    cd.db = x;
-
-    char c[REAL_TYPE_SIZE] = {0};
-    int  tpsize = REAL_TYPE_SIZE;
-
-    for ( int i = 0; i < tpsize; ++i)
-        c[i] = cd.c[tpsize-i-1];
-    x = *(real*)c;
-}
-/**
- * @brief toBigEndian
- * 转换int型数据字节序
- * @param x
- */
-void  toBigEndian(int& x)
-{
-    x = ( (x & 0x000000ff) << 24 ) | ( (x & 0x0000ff00) << 8)
-            | ((x & 0x00ff0000) >> 8) | ( (x & 0xff000000) >> 24);
-}
+#include "common.h"
 
 
 Navigate::Navigate()
@@ -83,14 +48,16 @@ void Navigate::LoadPointsFile(const char *file)
     int floorcount = 0,k = 0;
 
     if ( NULL == f )
+    {
         return;
+    }
 
-    //楼层编号
+    //楼宇编号
     fread(buf,1,32,f);
     //楼层数
     fread(&floorcount,sizeof(int),1,f);
     toBigEndian(floorcount);
-    if ( floorcount <= 0) return;
+    if ( floorcount <= 0) { return; }
 
     //for 楼层
     for ( k = 0 ; k < floorcount;k++)
@@ -155,13 +122,21 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     bool    bfinded = true;
     list<Node*> result;
     if ( start == NULL || end == NULL )
+    {
         return result;
+    }
+
     //起点终点相同，不予导航
     if ( EQUAL(start->x , end->x) && EQUAL(start->y,end->y))
+    {
         return result;
+    }
+
     //未给定路径，不予导航
     if (__points.size() <= 0)
+    {
         return result;
+    }
 
     assert(start != NULL && end != NULL);
 
@@ -234,7 +209,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     }
     else{
-//        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
+        //        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
     }
     Node *nd = _closeList.front();
     if ( nd != end )
@@ -257,22 +232,22 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
 void Navigate::AddToCloseList(Node *center)
 {
-//    Node *nd = new Node;
+    //    Node *nd = new Node;
 
-//    memcpy(nd,center,sizeof(Node));
-//    nd->parent = center->parent;
-//    _closeList.push_front(nd);
+    //    memcpy(nd,center,sizeof(Node));
+    //    nd->parent = center->parent;
+    //    _closeList.push_front(nd);
     _closeList.push_front(center);
 }
 //为尽可能简化程序，提高运行效率
 //该方法认为要添加的点在开放集中不存在，直接添加
 void Navigate::AddToOpenList(Node *parent,Node *center)
 {
-//    Node *nd = new Node;
+    //    Node *nd = new Node;
 
-//    memcpy(nd,center,sizeof(Node));
-//    nd->parent = parent;
-//    _openList.push_front(nd);
+    //    memcpy(nd,center,sizeof(Node));
+    //    nd->parent = parent;
+    //    _openList.push_front(nd);
     center->parent = parent;
     _openList.push_front(center);
 }
@@ -282,19 +257,19 @@ void Navigate::ClearResult()
 {
     _openList.clear();
     _closeList.clear();
-//    list<Node*> ::iterator it1 = _openList.begin();
-//    while ( it1 != _openList.end())
-//    {
-//        delete *it1;
-//        it1 = _openList.erase(it1);
-//    }
+    //    list<Node*> ::iterator it1 = _openList.begin();
+    //    while ( it1 != _openList.end())
+    //    {
+    //        delete *it1;
+    //        it1 = _openList.erase(it1);
+    //    }
 
-//    list<Node*> ::iterator it2 = _closeList.begin();
-//    while ( it2!= _closeList.end() )
-//    {
-//        delete *it2;
-//        it2 = _closeList.erase(it2);
-//    }
+    //    list<Node*> ::iterator it2 = _closeList.begin();
+    //    while ( it2!= _closeList.end() )
+    //    {
+    //        delete *it2;
+    //        it2 = _closeList.erase(it2);
+    //    }
 }
 
 real Navigate::GetGValue(Node *n1, Node *n2)
@@ -328,6 +303,7 @@ void Navigate::RemoveFromCloseList(Node *nd)
             ++iter;
     }
 }
+
 void Navigate::RemoveFromOpenList(Node *nd)
 {
     list<Node*>::iterator iter = _openList.begin();
@@ -336,10 +312,15 @@ void Navigate::RemoveFromOpenList(Node *nd)
         if ( EQUAL((*iter)->x,nd->x) && EQUAL((*iter)->y,nd->y) )
         {
             iter = _openList.erase(iter);
-        }else
+        }
+        else
+        {
             ++iter;
+        }
+
     }
 }
+
 Node* Navigate::GetMiniFNode(Node *cur)
 {
     list<Node*>::iterator iter = _openList.begin();
@@ -356,7 +337,7 @@ Node* Navigate::GetMiniFNode(Node *cur)
         {
             flag = true;
             minf = f;
-//            res->parent = cur;
+            //          res->parent = cur;
             res = (*iter);
         }
     }
@@ -383,11 +364,11 @@ void Navigate::UpdateDirect(list<Node *> &path)
     --iter;
 
     nd1->attr = WalkDirect;
-    for( iter ; iter != path.end(); ++iter )
+    for( ; iter != path.end(); ++iter )
     {
 
         Vec v12(nd2->x - nd1->x, nd2->y - nd1->y),
-            v13(nd3->x - nd1->x, nd3->y - nd1->y);
+                v13(nd3->x - nd1->x, nd3->y - nd1->y);
         Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
 
         real angle = VectorAngle(&v12,&v23);
@@ -396,18 +377,20 @@ void Navigate::UpdateDirect(list<Node *> &path)
         if ( angle > 15 && cross < 0)
         {
             nd2->attr = TurnRight;
-        }else if ( angle > 15 && cross > 0 )
+        }
+        else if ( angle > 15 && cross > 0 )
         {
             nd2->attr = TurnLeft;
-        }else
+        }
+        else
         {
             nd2->attr = WalkDirect;
         }
 
-//        if ( nd2->neighborcount <= 2)
-//        {
-//            nd2->attr = WalkAlong;
-//        }
+        //        if ( nd2->neighborcount <= 2)
+        //        {
+        //            nd2->attr = WalkAlong;
+        //        }
 
         nd1 = nd2;
         nd2 = nd3;
@@ -424,8 +407,6 @@ void Navigate::UpdateDirect(list<Node *> &path)
         --iter;
         --iter;
     }
-
-
 }
 
 Node *Navigate::GetNearPathNode(Node *nd)
@@ -434,7 +415,8 @@ Node *Navigate::GetNearPathNode(Node *nd)
     if ( nd->type == Endian )
     {
         return nd;
-    }else
+    }
+    else
     {
         int nbcount = nd->neighborcount;
         real mindis = INVALID;
@@ -454,22 +436,22 @@ Node *Navigate::GetNearPathNode(Node *nd)
         }
     }
 
-//    real mindis = INVALID;
-//    Node *res = NULL;
-//    int i = 0, count = __points.size();
-//    for ( i = 0 ; i < count; ++i)
-//    {
-//        if (__points[i]->type == Endian)
-//        {
-//            real dis = Distance(nd,__points[i]);
-//            if ( dis < mindis)
-//            {
-//                mindis = dis;
-//                res = __points[i];
-//            }
-//        }
+    //    real mindis = INVALID;
+    //    Node *res = NULL;
+    //    int i = 0, count = __points.size();
+    //    for ( i = 0 ; i < count; ++i)
+    //    {
+    //        if (__points[i]->type == Endian)
+    //        {
+    //            real dis = Distance(nd,__points[i]);
+    //            if ( dis < mindis)
+    //            {
+    //                mindis = dis;
+    //                res = __points[i];
+    //            }
+    //        }
 
-//    }
+    //    }
     return res;
 }
 
@@ -479,12 +461,14 @@ Node *Navigate::getNearestBind(Node *ndsrc)
     int     floor = ndsrc->floor;
     Node    *res = NULL;
 
-    if ( _floor_binds.find(floor) == _floor_binds.end() )
+    if (_floor_binds.find(floor) == _floor_binds.end()) {
         return NULL;
-    list<int>   lbs = _floor_binds[floor];
+    }
+
+    list<int> lbs = _floor_binds[floor];
 
     list<int>::iterator it = lbs.begin();
-    while ( it != lbs.end() )
+    while (it != lbs.end())
     {
         Node *nd = GetPoint(*it);
         real dis = Distance(ndsrc,nd);
