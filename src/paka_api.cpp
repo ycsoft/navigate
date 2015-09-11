@@ -117,6 +117,9 @@ vector<string> split(string str, string pattern)
      return result;
 }
 
+
+LPoint last;
+
 WifiPoint doLocate(const char* bssids)
 {
     string bssidstr = bssids;
@@ -137,9 +140,25 @@ WifiPoint doLocate(const char* bssids)
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
     LPoint p = global_wifi.LocationFloorPoint(floor_code.c_str(), fingers, count);
 
-    WifiPoint pp;
-    pp.id = p.pcode;
-    pp.x = p.x;
-    pp.y = p.y;
-    return pp;
+    if (last.pcode == -1) {
+        last.pcode = p.pcode;
+        last.x = p.x;
+        last.y = p.y;
+
+        WifiPoint pp;
+        pp.id = p.pcode;
+        pp.x = p.x;
+        pp.y = p.y;
+        return pp;
+    } else {
+        WifiPoint pp;
+        pp.id = p.pcode;
+        pp.x = p.x * 0.8 + last.x * 0.2;
+        pp.y = p.y * 0.8 + last.y * 0.2;
+
+        last.pcode = p.pcode;
+        last.x = p.x;
+        last.y = p.y;
+        return pp;
+    }
 }

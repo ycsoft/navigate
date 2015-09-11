@@ -44,6 +44,11 @@ typedef struct Point_ST {
     int pcode;
     double x;
     double y;
+    Point_ST() {
+        pcode = -1;
+        x = -1.0f;
+        y = -1.0f;
+    }
 } LPoint;
 
 // 相似度排序的时候，用到的临时结构体

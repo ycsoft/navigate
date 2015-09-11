@@ -10,6 +10,13 @@ typedef struct _Point
     int     attr;
     int     id;
     int     type;
+    _Point() {
+        x = -1.0f;
+        y = -1.0f;
+        id = -1;
+        attr = -1;
+        type = -1;
+    }
 }NavPoint, WifiPoint;
 
 typedef struct
