@@ -149,10 +149,13 @@ WifiPoint doLocate(const char* bssids)
         pp.id = p.pcode;
         pp.x = p.x;
         pp.y = p.y;
+        memcpy(pp.floor_code, p.floor_code, strlen(p.floor_code));
         return pp;
+
     } else {
         WifiPoint pp;
         pp.id = p.pcode;
+        memcpy(pp.floor_code, p.floor_code, strlen(p.floor_code));
         pp.x = p.x * 0.8 + last.x * 0.2;
         pp.y = p.y * 0.8 + last.y * 0.2;
 

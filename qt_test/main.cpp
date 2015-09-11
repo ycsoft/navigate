@@ -84,8 +84,6 @@ void test_wifi_location_jduge_which_floor() {
 }
 
 
-
-
 int main()
 {
     //test_wifi_location_read_file();

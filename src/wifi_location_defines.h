@@ -44,10 +44,12 @@ typedef struct Point_ST {
     int pcode;
     double x;
     double y;
+    const char* floor_code;
     Point_ST() {
         pcode = -1;
         x = -1.0f;
         y = -1.0f;
+        floor_code = NULL;
     }
 } LPoint;
 

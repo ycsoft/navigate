@@ -284,6 +284,7 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
 
     p = calFloorPointLocation(sptl);
     p.pcode = floorPCodeToGlobePCode(p.pcode, floor_wifi_info.floor_number);
+    p.floor_code = floor_wifi_info.floor_code.c_str();
     return p;
 }
 
