@@ -284,6 +284,7 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
 
     p = calFloorPointLocation(sptl);
     p.pcode = floorPCodeToGlobePCode(p.pcode, floor_wifi_info.floor_number);
+    p.floor_code = floor_wifi_info.floor_code.c_str();
     return p;
 }
 
@@ -433,6 +434,15 @@ LPoint WifiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
     {
         return ret;
     }
+
+    // 只取第一个点
+    SPointTemp &p1 = vecSpt[0];
+    ret.pcode = p1.pcode;
+    ret.x = p1.x;
+    ret.y = p1.y;
+    return ret;
+
+    /*
     // 取前三个点，求平均坐标，然后看平均坐标离哪个最近，则取最近的点
     double sum_x = 0.0;
     double sum_y = 0.0;
@@ -468,6 +478,7 @@ LPoint WifiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
     ret.x = mp.x;
     ret.y = mp.y;
     return ret;
+    */
 }
 
 // 计算两点距离

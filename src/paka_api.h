@@ -1,6 +1,9 @@
 ﻿#ifndef NAVIGATELIB_H
 #define NAVIGATELIB_H
 
+#include <stdio.h>
+#include <string.h>
+
 typedef double real;
 
 typedef struct _Point
@@ -10,7 +13,31 @@ typedef struct _Point
     int     attr;
     int     id;
     int     type;
-}NavPoint, WifiPoint;
+    _Point() {
+        x = -1.0f;
+        y = -1.0f;
+        id = -1;
+        attr = -1;
+        type = -1;
+    }
+}NavPoint;
+
+
+#define LEN_FLOOR_CODE 32
+typedef struct _Point_Wifi_ST
+{
+    double x;
+    double y;
+    int id;
+    char floor_code[LEN_FLOOR_CODE];
+    _Point_Wifi_ST() {
+        x = -1.0f;
+        y = -1.0f;
+        id = -1;
+        memset(floor_code, 0, LEN_FLOOR_CODE);
+    }
+} WifiPoint;
+
 
 typedef struct
 {
