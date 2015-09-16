@@ -38,10 +38,27 @@ typedef struct _Point_Wifi_ST
     }
 } WifiPoint;
 
+typedef struct _Multi_Point_Wifi_ST
+{
+    char floor_code[LEN_FLOOR_CODE];
+    int id1;
+    double x1;
+    double y1;
+    int id2;
+    double x2;
+    double y2;
+    int id3;
+    double x3;
+    double y3;
+    _Multi_Point_Wifi_ST() {
+        memset(this, 0, sizeof(_Multi_Point_Wifi_ST));
+    }
+} WifiMultiPoint;
+
 
 typedef struct
 {
-    int     num;
+    int       num;
     NavPoint  *pts;
 }PointArray;
 
@@ -78,6 +95,13 @@ extern "C"
      * \return
      */
     WifiPoint doLocate(const char* bssids);
+
+    /*!
+     * \brief doLocateTest 测试函数，使用多种方法进行相似度计算定位
+     * \param bssids
+     * \return
+     */
+    WifiMultiPoint doLocateTest(const char* bssids);
 
 }
 

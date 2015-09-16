@@ -204,7 +204,7 @@ int WifiLocation::addMacToAppearPointCodeMapList(string mac, int point_code, map
  * \param size 指纹个数
  * \return 楼层编号
  */
-string WifiLocation::LocationBuildingFloor(InputFinger* fingers[], int size)
+string WifiLocation::LocationBuildingFloor(RealTimeFinger* fingers[], int size)
 {
     // 分别计算每一个楼层，取匹配数目最高
     // 遍历map
@@ -233,7 +233,7 @@ string WifiLocation::LocationBuildingFloor(InputFinger* fingers[], int size)
  * \param finfo 单个楼层的wifi信息引用
  * \return 相似度(匹配个数)
  */
-int WifiLocation::calSimilarityInBuildingFloor(InputFinger* fingers[], int size, FloorWifiInfo &finfo)
+int WifiLocation::calSimilarityInBuildingFloor(RealTimeFinger* fingers[], int size, FloorWifiInfo &finfo)
 {
     map<string, MacListItem> &all_mac_map = finfo.all_mac_map;
     if (all_mac_map.size() == 0)
@@ -243,7 +243,7 @@ int WifiLocation::calSimilarityInBuildingFloor(InputFinger* fingers[], int size,
     int matched = 0;
     for (int i = 0; i < size; i++)
     {
-        InputFinger* f = fingers[i];
+        RealTimeFinger* f = fingers[i];
         string fmac = f->mac;
         map<string, MacListItem>::iterator iter = all_mac_map.find(fmac);
         if (iter != all_mac_map.end())
@@ -254,6 +254,31 @@ int WifiLocation::calSimilarityInBuildingFloor(InputFinger* fingers[], int size,
     return matched;
 }
 
+// 常规方式计算相似度
+LPoint WifiLocation::LocationFloorPoint_SCM_Normal(const char* floor_code,
+                          RealTimeFinger* realdata[],
+                          int size)
+{
+    return LocationFloorPoint(floor_code, realdata, size, enum_Normal);
+}
+
+// 相似度计算方法2
+LPoint WifiLocation::LocationFloorPoint_SCM_M2(const char* floor_code,
+                          RealTimeFinger* realdata[],
+                          int size)
+{
+    return LocationFloorPoint(floor_code, realdata, size, enum_M2);
+}
+
+// 相似度计算方法3
+LPoint WifiLocation::LocationFloorPoint_SCM_M3(const char* floor_code,
+                          RealTimeFinger* realdata[],
+                          int size)
+{
+    return LocationFloorPoint(floor_code, realdata, size, enum_M3);
+}
+
+
 /*!
  * \brief judge which point am I in the floor
  * \param floor_code 楼层编码
@@ -261,7 +286,10 @@ int WifiLocation::calSimilarityInBuildingFloor(InputFinger* fingers[], int size,
  * \param size 指纹容量
  * \return 定位点结构体
  */
-LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fingers[], int size)
+LPoint WifiLocation::LocationFloorPoint(const char* floor_code,
+                                        RealTimeFinger* realdata[],
+                                        int size,
+                                        SimilarityCalType calType)
 {
     LPoint p;
     p.x = -255.0;
@@ -276,13 +304,21 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
         // location error
         return p;
     }
+    FloorWifiInfo &floor_wifi_info = iter->second; // 楼层wifi
 
-    FloorWifiInfo &floor_wifi_info = iter->second;
-    set<int> possible_pcode_set = calPossiblePoints(fingers, size, floor_wifi_info.mac_point_code_map);
 
-    vector<SPointTemp> sptl = getSimilarPointCodeList(fingers, size, floor_wifi_info.finger_map, possible_pcode_set);
+    // 先挑选出可能的点，缩小比较范围
+    set<int> possible_pcode_set = calPossiblePoints(realdata, size, floor_wifi_info.mac_point_code_map);
 
+    // 得到按照相似度排列的点列表，可选择不同的相似度计算方式
+    vector<SPointTemp> sptl = getSimilarPointCodeList(realdata, size,
+                                                      floor_wifi_info.finger_map,
+                                                      possible_pcode_set,
+                                                      calType);
+    // 根据相似的点列表，计算定位点
     p = calFloorPointLocation(sptl);
+
+    // 一些其他工作
     p.pcode = floorPCodeToGlobePCode(p.pcode, floor_wifi_info.floor_number);
     p.floor_code = floor_wifi_info.floor_code.c_str();
     return p;
@@ -290,17 +326,25 @@ LPoint WifiLocation::LocationFloorPoint(const char* floor_code, InputFinger* fin
 
 /*!
  * \brief 计算可能的点，缩小进行相似度比较的采集点范围
+ *          先挑选出可能的点，缩小比较范围
+ *          例如，实时的wifi列表中有A B C D四个mac地址
+ *          mac A 在 p1 p2 p3点出现过
+ *          mac B 在 p1 p3 p4点出现过
+ *          mac C 在 p2 p3 p5点出现过
+ *          mac D 在 p3 p5 p6出现过
+ *          那么，则返回上述的点
+ *          下一步进行相似度计算的时候，则只需要在这些点中进行比较
  * \param fingers
  * \param size
  * \param finger_map
  * \return
  */
-set<int> WifiLocation::calPossiblePoints(InputFinger* fingers[], int size, map<string, list<int> > &mac_point_code_map)
+set<int> WifiLocation::calPossiblePoints(RealTimeFinger* realdata[], int size, map<string, list<int> > &mac_point_code_map)
 {
     set<int> ret;
     for (int i = 0; i < size; i++)
     {
-        InputFinger* f = fingers[i];
+        RealTimeFinger* f = realdata[i];
         map<string, list<int> >::iterator iter =  mac_point_code_map.find(f->mac);
         if (iter != mac_point_code_map.end())
         {
@@ -318,31 +362,67 @@ set<int> WifiLocation::calPossiblePoints(InputFinger* fingers[], int size, map<s
 
 /*!
  * \brief 计算传入的wifi数据与采集点指纹的相似度
+ *          方法1：仅比较mac地址是否匹配，匹配个数越多，相似度越高
  * \param fingers 传入的wifi data
  * \param size input wifi data length
  * \param ginfo gather point wifi info
- * \return similarity
+ * \return Similarities
  */
-int WifiLocation::calSimilarityInFloorGatherCode(InputFinger* fingers[], int size, GatherFingerInfo &ginfo)
+Similarities WifiLocation::calSimilarityInFloorGatherCode(RealTimeFinger* realdata[], int size, GatherFingerInfo &ginfo)
 {
     map<string, GatherFingerItem> &fingers_map = ginfo.fingers_map;
+    Similarities ret;
     if (fingers_map.size() == 0)
     {
-        return 0;
+        return ret;
     }
 
-    int matched = 0;
+    // 分别为三种方式求得的相似度
+    int s1 = 0; // 方法1，有匹配的mac地址则加1
+    float s2 = 0.0f; // 方法2，有匹配的mac地址则加  1 - |((rssi_now - rssi_old) / rssi_old)|
+    float s3 = 0.0f; // 方法3，在方法2的基础上 s3 = s2 * (now mac 顺序序号)^(-1/3)
+
     for (int i = 0; i < size; i++)
     {
-        InputFinger* f = fingers[i];
+        RealTimeFinger* f = realdata[i];
         string fmac = f->mac;
         map<string, GatherFingerItem>::iterator iter = fingers_map.find(fmac);
         if (iter != fingers_map.end())
         {
-            matched++;
+            GatherFingerItem &item = iter->second;
+            // 找到了是相同的mac
+            ++s1;
+            s2 = s2 + calSimilarity_M2(f->rssi, item.rssi);
+            s3 = s3 + calSimilarity_M3(f->rssi, item.rssi, i+1);
         }
     }
-    return matched;
+
+    ret.s1 = s1;
+    ret.s2 = s2;
+    ret.s3 = s3;
+
+    return ret;
+}
+
+// 相似度比较方法2
+// 在mac地址一致的情况下，matched 加入式子中给的值
+// 有匹配的mac地址则加  1 - |((rssi_now - rssi_old) / rssi_old)|
+float WifiLocation::calSimilarity_M2(int &rssi_in, int &rssi_f)
+{
+    float k1 = (float)rssi_in - (float)rssi_f;
+    float k2 = k1 / (float)rssi_f;
+    float k3 = abs(k2);
+    float k4 = 1.0f - k3;
+    return k4;
+}
+
+// 相似度比较方法3
+// 在方法2的基础上 s3 = s2 * (now mac 顺序序号)^(-1/3)
+float WifiLocation::calSimilarity_M3(int &rssi_in, int &rssi_f, int index_f)
+{
+    float k1 = calSimilarity_M2(rssi_in, rssi_f);
+    double k2 = pow(index_f, 1.0f / 3.0f);
+    return (float)(k1*k2);
 }
 
 /*!
@@ -353,11 +433,16 @@ int WifiLocation::calSimilarityInFloorGatherCode(InputFinger* fingers[], int siz
  * \param points 待比较的目标点
  * \return
  */
-int WifiLocation::getMostSimilarPointCode(InputFinger* fingers[], int size, map< int, GatherFingerInfo > &finger_map, set<int> &points)
+int WifiLocation::getMostSimilarPointCode(RealTimeFinger* fingers[],
+                                          int size,
+                                          map< int, GatherFingerInfo > &finger_map,
+                                          set<int> &points,
+                                          SimilarityCalType calType
+                                          )
 {
     set<int>::iterator iter = points.begin();
     int most_simi_code = -1;
-    int max_simi = -1;
+    float max_simi = -1.0;
 
     for ( ; iter != points.end(); ++iter)
     {
@@ -366,7 +451,23 @@ int WifiLocation::getMostSimilarPointCode(InputFinger* fingers[], int size, map<
         if (iter2 != finger_map.end())
         {
             GatherFingerInfo &info = iter2->second;
-            int simi = calSimilarityInFloorGatherCode(fingers, size, info);
+            // 得到最相似点，此处需按照不同的算法得到不同的点
+
+            Similarities ret = calSimilarityInFloorGatherCode(fingers, size, info);
+            float simi = 0.0f;
+            switch (calType) {
+            case enum_Normal:
+                simi = ret.s1;
+                break;
+            case enum_M2:
+                simi = ret.s2;
+                break;
+            case enum_M3:
+                simi = ret.s3;
+                break;
+            default:
+                break;
+            }
             if (simi > max_simi)
             {
                 max_simi = simi;
@@ -396,7 +497,10 @@ bool SortBySimi( const SPointTemp &v1, const SPointTemp &v2)//注意：本函数
  * \param points 待比较的目标点
  * \return
  */
-vector<SPointTemp> WifiLocation::getSimilarPointCodeList(InputFinger* fingers[], int size, map< int, GatherFingerInfo > &finger_map, set<int> &points)
+vector<SPointTemp> WifiLocation::getSimilarPointCodeList(RealTimeFinger* fingers[],
+                                                         int size, map< int, GatherFingerInfo > &finger_map,
+                                                         set<int> &points,
+                                                         SimilarityCalType calType)
 {
     vector<SPointTemp> fv;
     set<int>::iterator iter = points.begin();
@@ -407,11 +511,26 @@ vector<SPointTemp> WifiLocation::getSimilarPointCodeList(InputFinger* fingers[],
         if (iter2 != finger_map.end())
         {
             GatherFingerInfo &info = iter2->second;
-            int simi = calSimilarityInFloorGatherCode(fingers, size, info);
+
+            Similarities ret = calSimilarityInFloorGatherCode(fingers, size, info);
             SPointTemp spt;
             spt.x = info.p.x;
             spt.y = info.p.y;
-            spt.simi = simi;
+
+            spt.simi = 0;
+            switch (calType) {
+            case enum_Normal:
+                spt.simi = ret.s1;
+                break;
+            case enum_M2:
+                spt.simi = ret.s2;
+                break;
+            case enum_M3:
+                spt.simi = ret.s3;
+                break;
+            default:
+                break;
+            }
             spt.pcode = info.p.pcode;
             fv.push_back(spt);
         }
@@ -479,6 +598,71 @@ LPoint WifiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
     ret.y = mp.y;
     return ret;
     */
+
+    // m1 最相似点坐标
+
+    // m2 前三点平均
+
+    // m3  x0,y0 相似度最高点的坐标
+
+    //  now 指纹列表     相似度最高点的指纹列表
+    //  提取出一样的mac地址
+
+    //  mac1 now rssi 最相似点rssi mac1地址最强强度 最强强度出现的xy坐标 (x1,y1)
+    //  mac2 now rssi 最相似点rssi mac2地址最强强度 最强强度出现的xy坐标 (x2,y2)
+    //  mac3 now rssi 最相似点rssi mac3地址最强强度 最强强度出现的xy坐标 (x3,y3)
+
+    //  比值1 = rssi now 1 / rssi 最相似 1
+    //  比值2 = rssi now 2 / rssi 最相似 2
+    //  比值3 = rssi now 3 / rssi 最相似 3
+
+    //  x1 = （1 - 比值1） * （x1）+ (比值1 * x0)
+    //  y1 = （1 - 比值1） * （y1）+ (比值1 * y0)
+
+    //  x2 = （1 - 比值2） * （x2）+ (比值2 * x0)
+    //  y2 = （1 - 比值2） * （y2）+ (比值2 * y0)
+
+    //  x3 = （1 - 比值3） * （x3）+ (比值3 * x0)
+    //  y3 = （1 - 比值3） * （y3）+ (比值3 * y0)
+
+    // 如果i<=3直接做平均, xi yi分别求平均，得到坐标。。 end
+
+    // 如果i>3
+
+    // 求出d1 d2 d3..di （xi,yi) (x0, y0)距离
+
+    // 排序  大到小
+    //  d2   (x2,y2)
+    //  d3   (x3,y3)
+    //  d1   (x1,y1)
+    //  d4   (x4,y4)
+    //  d5   (x5,y5)
+
+
+// do
+    // 拿出最大 d2, 最小d5
+    // 平均值 davg
+    // 求统计标准差
+    // 对d求标准差 σd
+    //  t1 = abs(d_min - davg)/σd
+     // tn = abs(d_max - davg)/σd
+    // count_d
+    // ta = 0.00104*count_d**3.0 - 0.03903*count_d**2.0
+    //     + 0.54014*count_d   - 0.12437
+
+       // if(t1 >= ta) {
+            // 删d2
+       // } else if (tn >=ta) {
+       //   // 删d5
+       //}
+    //
+
+    //if (t1 < ta && tn < ta) break;
+    //if(count_d<=3) break;
+// while
+
+ // 得到x y列表，求平均
+
 }
 
 // 计算两点距离

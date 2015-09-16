@@ -22,12 +22,27 @@ public:
     int LoadWifiFile(const char* filepath);
 
     // judge which floor am I
-    string LocationBuildingFloor(InputFinger* fingers[], int size);
+    string LocationBuildingFloor(RealTimeFinger* realdata[], int size);
 
-    // judge which point am I in the floor
-    LPoint LocationFloorPoint(const char* floor_code, InputFinger* fingers[], int size);
+
+    // 根据不同的方法判断在哪个点
+    LPoint LocationFloorPoint_SCM_Normal(const char* floor_code,
+                              RealTimeFinger* realdata[],
+                              int size);
+    LPoint LocationFloorPoint_SCM_M2(const char* floor_code,
+                              RealTimeFinger* realdata[],
+                              int size);
+    LPoint LocationFloorPoint_SCM_M3(const char* floor_code,
+                              RealTimeFinger* realdata[],
+                              int size);
 
 private:
+
+    // judge which point am I in the floor
+    LPoint LocationFloorPoint(const char* floor_code,
+                              RealTimeFinger* realdata[],
+                              int size,
+                              SimilarityCalType calType);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // about the data input
@@ -37,23 +52,32 @@ private:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // about the loc judge which floor in building
     // 计算传入的wifi数据与楼层wifi列表的相似度
-    int calSimilarityInBuildingFloor(InputFinger* fingers[], int size, FloorWifiInfo &finfo);
+    int calSimilarityInBuildingFloor(RealTimeFinger* fingers[], int size, FloorWifiInfo &finfo);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // about the loc judge which point in floor
     // 计算传入的wifi数据与采集点指纹的相似度
-    int calSimilarityInFloorGatherCode(InputFinger* fingers[], int size, GatherFingerInfo &ginfo);
+    Similarities calSimilarityInFloorGatherCode(RealTimeFinger* fingers[], int size, GatherFingerInfo &ginfo);
+
+    // 相似度比较方法2
+    inline float calSimilarity_M2(int &rssi_in, int &rssi_f);
+
+    // 相似度比较方法3
+    inline float calSimilarity_M3(int &rssi_in, int &rssi_f, int index_f);
 
     // 计算可能的点，缩小进行相似度比较的采集点范围
-    set<int> calPossiblePoints(InputFinger* fingers[], int size, map<string, list<int> > &mac_point_code_map);
+    set<int> calPossiblePoints(RealTimeFinger* fingers[], int size, map<string, list<int> > &mac_point_code_map);
 
     // 得到最相似点
-    int getMostSimilarPointCode(InputFinger* fingers[], int size,
-                                map< int, GatherFingerInfo > &finger_map, set<int> &points);
+    int getMostSimilarPointCode(RealTimeFinger* fingers[], int size,
+                                map< int, GatherFingerInfo > &finger_map, set<int> &points,
+                                SimilarityCalType calType);
 
     // 得到相似点列表，按照相似度排序
-    vector<SPointTemp> getSimilarPointCodeList(InputFinger* fingers[], int size,
-                                               map< int, GatherFingerInfo > &finger_map, set<int> &points);
+    vector<SPointTemp> getSimilarPointCodeList(RealTimeFinger* fingers[], int size,
+                                               map< int, GatherFingerInfo > &finger_map,
+                                               set<int> &points,
+                                               SimilarityCalType calType);
 
     // 得到最相似点后计算XY坐标
     LPoint calFloorPointLocation(vector<SPointTemp> vecSpt);
