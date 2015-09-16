@@ -1,11 +1,11 @@
-#include "wifi_location.h"
+﻿#include "wifi_location.h"
+#include "common.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <algorithm>
 #include <cmath>
-
-#include "common.h"
+#include <string>
 
 WifiLocation::WifiLocation()
 {

@@ -21,6 +21,8 @@
 #define     UpStairs                12  //到楼上
 #define     DownStairs              -12 //到楼下
 
+#define     CloseToU               13  //就在跟前
+
 
 #define     RightHandSys            1
 #define     LeftHandSys             -1
@@ -33,8 +35,8 @@
 #define     ZERO                    0.000001f
 #define     EQUAL(x,y)              (x - y <= ZERO && x - y >= 0-ZERO )
 
-#define     Distance(nx,ny)         sqrt(((nx->x - ny->x)*(nx->x - ny->x) \
-                                    +(nx->y - ny->y)*(nx->y - ny->y)))
+#define     Distance(nx,ny)         sqrt((((nx)->x - (ny)->x)*((nx)->x - (ny)->x) \
+                                    +((nx)->y - (ny)->y)*((nx)->y - (ny)->y)))
 
 #define     FloorFromID(ID)       ( (ID)/10000 )
 
@@ -46,6 +48,8 @@
                                         (ID == WalkAlong ? "WalkAlong" : \
                                         (ID == Arrive ? "Arrive":""))))))   \
                                    )
+
+#define     INVALID_ID              -1  //无效的楼层编号
 
 using namespace std;
 

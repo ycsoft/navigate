@@ -69,6 +69,7 @@ public:
         return _id2points[id];
     }
 
+    Node* FindTagPoint(void *start, void *end);
     ///
     /// \brief GetAllPoints
     ///

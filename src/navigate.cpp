@@ -1,12 +1,13 @@
-﻿#include "navigate.h"
-
-#include <assert.h>
+﻿#include <assert.h>
 #include <cstdio>
 #include <string.h>
 #include <cmath>
 
-#include "common.h"
 
+#include "common.h"
+#include "navigate.h"
+#include "paka_api.h"
+#include "navigate_defines.h"
 
 Navigate::Navigate()
 {
@@ -354,8 +355,10 @@ Node* Navigate::GetMiniFNode(Node *cur)
 //路径中至少需包含三个数据点
 void Navigate::UpdateDirect(list<Node *> &path)
 {
-    if ( path.size() < 3)
+    if ( path.size() == 2)
     {
+        Node *pn = path.front();
+        pn->attr = CloseToU;
         return;
     }
 
@@ -369,34 +372,45 @@ void Navigate::UpdateDirect(list<Node *> &path)
     --iter;
     --iter;
 
-    nd1->attr = WalkDirect;
+    if ( FloorFromID(nd1->id) < FloorFromID(nd2->id))
+    {
+        nd1->attr = UpStairs;
+    }else if ( FloorFromID(nd1->id) > FloorFromID(nd2->id))
+    {
+        nd1->attr = DownStairs;
+    }else
+    {
+        nd1->attr = WalkDirect;
+    }
+
     for( ; iter != path.end(); ++iter )
     {
-
-        Vec v12(nd2->x - nd1->x, nd2->y - nd1->y);
-        Vec v13(nd3->x - nd1->x, nd3->y - nd1->y);
-        Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
-
-        real angle = VectorAngle(&v12,&v23);
-
-        real cross = VectorCrossMulti(&v12,&v13);
-        if ( angle > 15 && cross < 0)
+        if ( FloorFromID(nd2->id) < FloorFromID(nd3->id))
         {
-            nd2->attr = TurnRight;
-        }
-        else if ( angle > 15 && cross > 0 )
+            nd2->attr = UpStairs;
+        }else if ( FloorFromID(nd2->id) > FloorFromID(nd3->id) )
         {
-            nd2->attr = TurnLeft;
-        }
-        else
+            nd2->attr = DownStairs;
+        }else
         {
-            nd2->attr = WalkDirect;
+            Vec v12(nd2->x - nd1->x, nd2->y - nd1->y);
+            Vec v13(nd3->x - nd1->x, nd3->y - nd1->y);
+            Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
+            real angle = VectorAngle(&v12,&v23);
+            real cross = VectorCrossMulti(&v12,&v13);
+            if ( angle > 15 && cross < 0)
+            {
+                nd2->attr = TurnRight;
+            }
+            else if ( angle > 15 && cross > 0 )
+            {
+                nd2->attr = TurnLeft;
+            }
+            else
+            {
+                nd2->attr = WalkDirect;
+            }
         }
-
-        //        if ( nd2->neighborcount <= 2)
-        //        {
-        //            nd2->attr = WalkAlong;
-        //        }
 
         nd1 = nd2;
         nd2 = nd3;
@@ -487,5 +501,40 @@ Node *Navigate::getNearestBind(Node *ndsrc)
         ++it;
     }
 
+    return res;
+}
+
+Node *Navigate::FindTagPoint(void *st, void *ed)
+{
+    NavPoint *start = (NavPoint*)st;
+    NavPoint *end = (NavPoint*)ed;
+    Node    *res = NULL;
+    int     floor;
+    vector<Node*>::iterator piter = __points.begin();
+    real    mindis = INVALID;
+
+    if ( INVALID_ID == start->id )
+    {
+        floor = start->floor;
+        while ( piter != __points.end() )
+        {
+            if ( FloorFromID((*piter)->id) != floor )
+            {
+                ++piter;
+                continue;
+            }
+            real dis = Distance(start,*piter) + Distance(start,end);
+            if ( dis < mindis )
+            {
+                mindis = dis;
+                res = (*piter);
+            }
+            ++piter;
+        }
+
+    }else
+    {
+        res = _id2points[start->id];
+    }
     return res;
 }

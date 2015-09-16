@@ -13,6 +13,7 @@ typedef struct _Point
     int     attr;
     int     id;
     int     type;
+    int     floor;
     _Point() {
         x = -1.0f;
         y = -1.0f;
@@ -81,6 +82,8 @@ extern "C"
      * \return
      */
     PointArray getBestPath(NavPoint *start, NavPoint *end);
+
+    PointArray wifi_getBestPath();
 
     /*!
      * \brief 加载wifi数据文件

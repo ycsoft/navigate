@@ -1,5 +1,6 @@
-﻿#include "paka_api.h"
+﻿
 #include "navigate.h"
+#include "paka_api.h"
 #include "wifi_location.h"
 #include "navigate_defines.h"
 #include "navigate_defines.h"
@@ -41,16 +42,26 @@ PointArray loadPathInfo(const char *filepath)
 
 PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
-    Node *nstart = global_nav.GetPoint(start->id);
-    Node *nend = global_nav.GetPoint(end->id);
-    int stfloor = FloorFromID(start->id);
-    int edfloor = FloorFromID(start->id);
+    Node *nstart = NULL, *nend = NULL;
+    //判断传入的点是否为标记点，进行必要的定位起始点工作
+    if ( INVALID_ID ==  start->id)
+    {
+        nstart = global_nav.FindTagPoint(start,end);
+    }else
+    {
+        nstart = global_nav.GetPoint(start->id);
+    }
+    nend = global_nav.GetPoint(end->id);
+
+
+    int stfloor = FloorFromID(nstart->id);
+    int edfloor = FloorFromID(nend->id);
     list<Node*> path;
 
     if ( stfloor != edfloor )
     {
-        Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(start->id));
-        Node *dest2  = global_nav.getNearestBind(global_nav.GetPoint(end->id));
+        Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(nstart->id));
+        Node *dest2  = global_nav.getNearestBind(global_nav.GetPoint(nend->id));
         list<Node*>  tmppath = global_nav.GetBestPath(nstart,dest1),
                      tmppath2 = global_nav.GetBestPath(dest2,nend);
         list<Node*>::iterator it = tmppath.begin();
