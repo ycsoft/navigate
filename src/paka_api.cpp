@@ -118,13 +118,11 @@ vector<string> split(string str, string pattern)
 }
 
 
-LPoint last;
-
 WifiPoint doLocate(const char* bssids)
 {
     string bssidstr = bssids;
     vector<string> macs = split(bssidstr, ";");
-    InputFinger** fingers = new InputFinger*[macs.size()];
+    RealTimeFinger** fingers = new RealTimeFinger*[macs.size()];
     int count = 0;
     for (size_t i = 0; i < macs.size(); ++i)
     {
@@ -132,36 +130,60 @@ WifiPoint doLocate(const char* bssids)
         vector<string> item = split(mac, ",");
         if (item.size() == 2)
         {
-            InputFinger* ff = new InputFinger(item[0], atoi(item[1].c_str()));
+            RealTimeFinger* ff = new RealTimeFinger(item[0], atoi(item[1].c_str()));
             fingers[count] = ff;
             count++;
         }
     }
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
-    LPoint p = global_wifi.LocationFloorPoint(floor_code.c_str(), fingers, count);
-
-    if (last.pcode == -1) {
-        last.pcode = p.pcode;
-        last.x = p.x;
-        last.y = p.y;
-
-        WifiPoint pp;
-        pp.id = p.pcode;
-        pp.x = p.x;
-        pp.y = p.y;
-        memcpy(pp.floor_code, p.floor_code, strlen(p.floor_code));
-        return pp;
-
-    } else {
-        WifiPoint pp;
-        pp.id = p.pcode;
-        memcpy(pp.floor_code, p.floor_code, strlen(p.floor_code));
-        pp.x = p.x * 0.8 + last.x * 0.2;
-        pp.y = p.y * 0.8 + last.y * 0.2;
-
-        last.pcode = p.pcode;
-        last.x = p.x;
-        last.y = p.y;
-        return pp;
-    }
+    LPoint p = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
+    WifiPoint pp;
+    pp.id = p.pcode;
+    pp.x = p.x;
+    pp.y = p.y;
+    memcpy(pp.floor_code, p.floor_code, strlen(p.floor_code));
+    return pp;
 }
+
+WifiMultiPoint doLocateTest(const char* bssids)
+{
+    string bssidstr = bssids;
+    vector<string> macs = split(bssidstr, ";");
+    RealTimeFinger** fingers = new RealTimeFinger*[macs.size()];
+    int count = 0;
+    for (size_t i = 0; i < macs.size(); ++i)
+    {
+        string mac = macs[i];
+        vector<string> item = split(mac, ",");
+        if (item.size() == 2)
+        {
+            RealTimeFinger* ff = new RealTimeFinger(item[0], atoi(item[1].c_str()));
+            fingers[count] = ff;
+            count++;
+        }
+    }
+    string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
+
+    // 不同的计算方式
+    LPoint p1 = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
+    LPoint p2 = global_wifi.LocationFloorPoint_SCM_M2(floor_code.c_str(), fingers, count);
+    LPoint p3 = global_wifi.LocationFloorPoint_SCM_M3(floor_code.c_str(), fingers, count);
+
+    WifiMultiPoint ppp;
+    memcpy(ppp.floor_code, p1.floor_code, strlen(p1.floor_code));
+
+    ppp.id1 = p1.pcode;
+    ppp.x1 = p1.x;
+    ppp.y1 = p1.y;
+
+    ppp.id2 = p2.pcode;
+    ppp.x2 = p2.x;
+    ppp.y2 = p2.y;
+
+    ppp.id3 = p3.pcode;
+    ppp.x3 = p3.x;
+    ppp.y3 = p3.y;
+
+    return ppp;
+}
+
