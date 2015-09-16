@@ -14,6 +14,8 @@
 #define     WalkDirect              5   //直行
 
 #define     WalkAlong               6   //沿弯路继续前行
+#define     AlongLeft               63  //靠左行走
+#define     AlongRight              64  //靠右行走
 
 
 #define     Arrive                  11  //到达
@@ -46,7 +48,9 @@
                                         (ID == TurnRight ? "右转": \
                                         (ID == WalkDirect? "直行" : \
                                         (ID == WalkAlong ? "继续前行" : \
-                                        (ID == Arrive ? "到达":""))))))   \
+                                        (ID == Arrive ? "到达": \
+                                        (ID == AlongLeft ? "靠左行走": \
+                                        (ID == AlongRight ? "靠右行走":"无法判断方向"))))))))   \
                                    )
 
 #define     INVALID_ID              -1  //无效的楼层编号

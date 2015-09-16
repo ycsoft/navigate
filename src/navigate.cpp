@@ -398,13 +398,27 @@ void Navigate::UpdateDirect(list<Node *> &path)
             Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
             real angle = VectorAngle(&v12,&v23);
             real cross = VectorCrossMulti(&v12,&v13);
-            if ( angle > 15 && cross < 0)
+
+            if ( cross < 0)
             {
-                nd2->attr = TurnRight;
+                if ( angle > 15 )
+                {
+                    nd2->attr = TurnRight;
+                }else
+                {
+                    nd2->attr = AlongRight;
+                }
             }
-            else if ( angle > 15 && cross > 0 )
+            else if ( cross > 0 )
             {
-                nd2->attr = TurnLeft;
+                if ( angle > 15 )
+                {
+                   nd2->attr = TurnLeft;
+                }else
+                {
+                    nd2->attr = AlongLeft;
+                }
+
             }
             else
             {
