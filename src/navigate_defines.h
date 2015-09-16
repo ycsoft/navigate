@@ -19,7 +19,7 @@
 #define     Arrive                  11  //到达
 
 #define     UpStairs                12  //到楼上
-#define     DownStairs              -12  //到楼下
+#define     DownStairs              -12 //到楼下
 
 
 #define     RightHandSys            1
@@ -38,11 +38,13 @@
 
 #define     FloorFromID(ID)       ( (ID)/10000 )
 
-#define     GetTips(ID)           (ID == TurnLeft ? "左转": \
-                                        (ID == TurnRight ? "右转": \
-                                        (ID == WalkDirect? "直行" : \
-                                        (ID == WalkAlong ? "继续沿路行走" : \
-                                        (ID == Arrive ? "到达":""))))   \
+#define     GetTips(ID)           (ID == TurnLeft ? "TurnLeft": \
+                                        (ID == UpStairs ? "UpStairs": \
+                                        (ID == DownStairs ? "DownStairs": \
+                                        (ID == TurnRight ? "TurnRight": \
+                                        (ID == WalkDirect? "WalkDirect" : \
+                                        (ID == WalkAlong ? "WalkAlong" : \
+                                        (ID == Arrive ? "Arrive":""))))))   \
                                    )
 
 using namespace std;

@@ -127,10 +127,15 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     }
 
     //起点终点相同，不予导航
-    if ( EQUAL(start->x , end->x) && EQUAL(start->y,end->y))
+    if (start->id == end->id)
     {
         return result;
     }
+
+//    if ( EQUAL(start->x , end->x) && EQUAL(start->y,end->y))
+//    {
+//        return result;
+//    }
 
     //未给定路径，不予导航
     if (__points.size() <= 0)
@@ -341,7 +346,6 @@ Node* Navigate::GetMiniFNode(Node *cur)
             res = (*iter);
         }
     }
-
     return res;
 }
 
@@ -351,7 +355,9 @@ Node* Navigate::GetMiniFNode(Node *cur)
 void Navigate::UpdateDirect(list<Node *> &path)
 {
     if ( path.size() < 3)
+    {
         return;
+    }
 
     list<Node*>::iterator iter = path.begin();
     Node *nd1 = *iter;
@@ -367,8 +373,8 @@ void Navigate::UpdateDirect(list<Node *> &path)
     for( ; iter != path.end(); ++iter )
     {
 
-        Vec v12(nd2->x - nd1->x, nd2->y - nd1->y),
-                v13(nd3->x - nd1->x, nd3->y - nd1->y);
+        Vec v12(nd2->x - nd1->x, nd2->y - nd1->y);
+        Vec v13(nd3->x - nd1->x, nd3->y - nd1->y);
         Vec v23(nd3->x - nd2->x, nd3->y - nd2->y);
 
         real angle = VectorAngle(&v12,&v23);
@@ -461,7 +467,8 @@ Node *Navigate::getNearestBind(Node *ndsrc)
     int     floor = ndsrc->floor;
     Node    *res = NULL;
 
-    if (_floor_binds.find(floor) == _floor_binds.end()) {
+    if (_floor_binds.find(floor) == _floor_binds.end())
+    {
         return NULL;
     }
 

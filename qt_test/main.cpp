@@ -3,7 +3,6 @@
 #include <cstring>
 #include <list>
 
-
 #include "../src/navigate.h"
 #include "../src/wifi_location.h"
 
@@ -23,7 +22,7 @@ void test( int id1, int id2 )
     list<Node*> path  = nav.GetBestPath(start,end);
     path = nav.GetBestPath(start,end);
     list<Node*>::iterator iter = path.begin();
-    cout<<"最佳路径:"<<endl;
+    cout<<"Best path:"<<endl;
     while ( iter != path.end())
     {
         cout<<(*iter)->id<<"    "<<GetTips((*iter)->attr)<<endl;
@@ -34,7 +33,11 @@ void test( int id1, int id2 )
 
 void test_navigate() {
     //加载地图路径点文件
-    nav.LoadPointsFile("../data/mg.i2");
+    nav.LoadPointsFile("F:\\_temp\\mg.i2");
+
+    test(30033,20033);
+    cout<<endl;
+
     //设置导航起点与终点
     test(30001,30045);
     cout<<endl;
@@ -45,11 +48,9 @@ void test_navigate() {
     test(30011,30025);
     cout<<endl;
 
-    for ( int i = 0 ; i < 10; i++)
-    {
-        test(30085,30086);
-        cout<<endl;
-    }
+    test(30085,30086);
+    cout<<endl;
+
 }
 
 
@@ -88,9 +89,12 @@ int main()
 {
     //test_wifi_location_read_file();
     //test_wifi_location_jduge_which_floor();
-    loadWifiInfo("E:\\_t\\wifi\\wfinger.f");
-    const char* bssids = "14759071f8b4,-44;bcd17798c642,-46;08107692b1a9,-48;20c9d0188cdc,-48;78d38dbcbc74,-55;9c216ae323a0,-55;80891724fed8,-59;78d38dbcbc78,-59;d0c7c00bbb5a,-59;54e6fc22046a,-59;202bc19f3639,-61;147590dc8346,-61;d0c7c08a440f,-79;b85510716928,-94;b85510716929,-94";
-    WifiMultiPoint pp = doLocateTest(bssids);
+    //loadWifiInfo("E:\\_t\\wifi\\wfinger.f");
+   // const char* bssids = "14759071f8b4,-44;bcd17798c642,-46;08107692b1a9,-48;20c9d0188cdc,-48;78d38dbcbc74,-55;9c216ae323a0,-55;80891724fed8,-59;78d38dbcbc78,-59;d0c7c00bbb5a,-59;54e6fc22046a,-59;202bc19f3639,-61;147590dc8346,-61;d0c7c08a440f,-79;b85510716928,-94;b85510716929,-94";
+    //WifiMultiPoint pp = doLocateTest(bssids);
+    test_navigate();
+
+
 
     return 0;
 }
