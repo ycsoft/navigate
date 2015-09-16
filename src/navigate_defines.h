@@ -40,13 +40,13 @@
 
 #define     FloorFromID(ID)       ( (ID)/10000 )
 
-#define     GetTips(ID)           (ID == TurnLeft ? "TurnLeft": \
-                                        (ID == UpStairs ? "UpStairs": \
-                                        (ID == DownStairs ? "DownStairs": \
-                                        (ID == TurnRight ? "TurnRight": \
-                                        (ID == WalkDirect? "WalkDirect" : \
-                                        (ID == WalkAlong ? "WalkAlong" : \
-                                        (ID == Arrive ? "Arrive":""))))))   \
+#define     GetTips(ID)           (ID == TurnLeft ? "左转": \
+                                        (ID == UpStairs ? "上楼": \
+                                        (ID == DownStairs ? "下楼": \
+                                        (ID == TurnRight ? "右转": \
+                                        (ID == WalkDirect? "直行" : \
+                                        (ID == WalkAlong ? "继续前行" : \
+                                        (ID == Arrive ? "到达":""))))))   \
                                    )
 
 #define     INVALID_ID              -1  //无效的楼层编号

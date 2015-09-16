@@ -198,3 +198,15 @@ WifiMultiPoint doLocateTest(const char* bssids)
     return ppp;
 }
 
+////////////////////////////////
+
+NavPoint    *GetPoint(int id)
+{
+    Node *nd = global_nav.GetPoint(id);
+    NavPoint *pt = new NavPoint;
+    pt->x = nd->x;
+    pt->y = nd->y;
+    pt->id = nd->id;
+    pt->attr = nd->attr;
+    return pt;
+}

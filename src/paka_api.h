@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define     PRIVATE
+
 typedef double real;
 
 typedef struct _Point
@@ -105,6 +107,14 @@ extern "C"
      * \return
      */
     WifiMultiPoint doLocateTest(const char* bssids);
+
+    /*!
+     * \brief GetPoint
+     * 该函数仅供内部测试使用
+     * \param id
+     * \return
+     */
+    PRIVATE NavPoint    *GetPoint(int id);
 
 }
 
