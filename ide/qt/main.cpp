@@ -22,23 +22,20 @@ void outputFloors( PointArray paths )
 
 int main()
 {
-    cout << "Hello World!" << endl;
+
     PointArray paths = loadPathInfo("mg(916_2326).i2");
     outputFloors(paths);
 
     NavPoint start =  paths.pts[0]
             ,end =  paths.pts[20];
 
-//    start.x += 10;
-//    start.y += 5;
-//    start.id = -1;
-//    start.floor = 2;
     end.x += 10;
     end.y += 5;
     end.id = -1;
     end.floor = 3;
 
-    start = *(GetPoint(20021));
+    NavPoint *pnav = GetPoint(20021);
+    start = (pnav == NULL ? NavPoint():(*(pnav)));
     PointArray results = getBestPath(&end,&start);
     int i = 0;
     for( ; i < results.num; i++)
