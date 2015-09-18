@@ -43,6 +43,8 @@ PointArray loadPathInfo(const char *filepath)
 PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
     Node *nstart = NULL, *nend = NULL;
+    PointArray result;
+    memset(&result,0,sizeof(PointArray));
     //判断传入的点是否为标记点，进行必要的定位起始点工作
     if ( INVALID_ID ==  start->id)
     {
@@ -52,7 +54,11 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         nstart = global_nav.GetPoint(start->id);
     }
     nend = global_nav.GetPoint(end->id);
-
+    if ( nend == NULL )
+    {
+        cerr<<"目标点为空"<<endl;
+        return result;
+    }
 
     int stfloor = FloorFromID(nstart->id);
     int edfloor = FloorFromID(nend->id);
@@ -62,6 +68,12 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     {
         Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(nstart->id));
         Node *dest2  = global_nav.getNearestBind(global_nav.GetPoint(nend->id));
+        if ( dest1 == NULL || dest2 == NULL )
+        {
+            cerr<<"无法到达目标点"<<endl;
+            return result;
+        }
+
         list<Node*>  tmppath = global_nav.GetBestPath(nstart,dest1),
                      tmppath2 = global_nav.GetBestPath(dest2,nend);
         list<Node*>::iterator it = tmppath.begin();
@@ -84,7 +96,6 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         path = global_nav.GetBestPath(nstart,nend);
     }
 
-    PointArray result;
     result.num = path.size();
     result.pts = new NavPoint[result.num];
     list<Node*>::iterator it = path.begin();
@@ -204,6 +215,10 @@ NavPoint    *GetPoint(int id)
 {
     Node *nd = global_nav.GetPoint(id);
     NavPoint *pt = new NavPoint;
+    if ( NULL == nd || NULL == pt )
+    {
+        return NULL;
+    }
     pt->x = nd->x;
     pt->y = nd->y;
     pt->id = nd->id;

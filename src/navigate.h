@@ -66,6 +66,10 @@ public:
     ///
     Node *GetPoint(int id)
     {
+        if ( _id2points.empty() )
+        {
+            return NULL;
+        }
         return _id2points[id];
     }
 

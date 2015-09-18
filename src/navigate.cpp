@@ -50,6 +50,7 @@ void Navigate::LoadPointsFile(const char *file)
 
     if ( NULL == f )
     {
+        cerr<<"无法读取文件"<<endl;
         return;
     }
 
@@ -132,39 +133,35 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     {
         return result;
     }
-
-//    if ( EQUAL(start->x , end->x) && EQUAL(start->y,end->y))
-//    {
-//        return result;
-//    }
-
     //未给定路径，不予导航
     if (__points.size() <= 0)
     {
         return result;
     }
-
-    assert(start != NULL && end != NULL);
-
     _start = start;
     _end = end;
 
-    Node *start_2 = start;//GetNearPathNode(start);
-    Node *end_2 = end;//GetNearPathNode(end);
+//    Node *start_2 = start;//GetNearPathNode(start);
+//    Node *end_2 = end;//GetNearPathNode(end);
 
     list<Node*>  endNeighbor = GetNeighbor(end);
+    if ( endNeighbor.size() < 1)
+    {
+        cerr<<"目标点不可到达"<<endl;
+        return result;
+    }
 
-    list<Node*> neighbor = GetNeighbor(start_2);
+    list<Node*> neighbor = GetNeighbor(start);
     list<Node*>::iterator iter = neighbor.begin();
 
     for ( ; iter != neighbor.end(); ++iter)
     {
-        AddToOpenList( start_2,*iter );
+        AddToOpenList( start,*iter );
     }
-    AddToCloseList( start_2 );
-    Node *nstart = start_2;
-    //memcpy(&nstart,start,sizeof(Node));
-    while ( !IsInPath(_closeList,end_2) && !IsInPath(endNeighbor,_closeList.front()))
+    AddToCloseList( start );
+    Node *nstart = start;
+
+    while ( !IsInPath(_closeList,end) && !IsInPath(endNeighbor,_closeList.front()))
     {
         if ( _openList.empty())
         {
@@ -222,12 +219,12 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     {
         result.push_front(end);
     }
-    while ( (*nd)!=(*start_2) )
+    while ( (*nd)!=(*start) )
     {
         result.push_front(nd);
         nd = nd->parent;
     }
-    result.push_front(start_2);
+    result.push_front(start);
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
@@ -357,8 +354,17 @@ void Navigate::UpdateDirect(list<Node *> &path)
 {
     if ( path.size() == 2)
     {
-        Node *pn = path.front();
-        pn->attr = CloseToU;
+        if ( FloorFromID(path.front()->id) < FloorFromID(path.back()->id))
+        {
+            path.front()->attr = UpStairs;
+        }else if ( FloorFromID(path.front()->id) > FloorFromID(path.back()->id))
+        {
+            path.front()->attr = DownStairs;
+        }else
+        {
+            path.front()->attr = CloseToU;
+        }
+        path.back()->attr = Arrive;
         return;
     }
 
