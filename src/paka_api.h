@@ -85,8 +85,6 @@ extern "C"
      */
     PointArray getBestPath(NavPoint *start, NavPoint *end);
 
-    PointArray wifi_getBestPath();
-
     /*!
      * \brief 加载wifi数据文件
      * \param filepath
