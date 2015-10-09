@@ -11,13 +11,11 @@ void test( int id1, int id2 )
 {
     cout<<"From: "<<id1<<" To: "<<id2<<endl;
 
-
     NavPoint start;
     NavPoint end;
 
     start.id = id1;
     end.id = id2;
-
 
     PointArray ret  = getBestPath(&start, &end);
 
@@ -26,7 +24,6 @@ void test( int id1, int id2 )
     for (int i = 0; i < num; ++i) {
         NavPoint e = p[i];
         cout << e.id << " " << GetTips(e.attr) << endl;
-
     }
     cout<<endl;
 }

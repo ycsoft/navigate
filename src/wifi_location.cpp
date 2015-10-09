@@ -579,7 +579,7 @@ LPoint WifiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
 
 
 // 根据距离的排序函数
-bool disCompare(CalTemp &arg1, CalTemp &arg2)
+bool disCompare(const CalTemp &arg1, const CalTemp &arg2)
 {
     return arg1.d > arg2.d;
 }
