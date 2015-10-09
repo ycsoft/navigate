@@ -147,7 +147,7 @@ WifiPoint doLocate(const char* bssids)
         }
     }
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
-    LPoint p = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
+    LPoint p = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
     WifiPoint pp;
     pp.id = p.pcode;
     pp.x = p.x;
@@ -176,9 +176,10 @@ WifiMultiPoint doLocateTest(const char* bssids)
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
 
     // 不同的计算方式
-    LPoint p1 = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
-    LPoint p2 = global_wifi.LocationFloorPoint_SCM_M2(floor_code.c_str(), fingers, count);
-    LPoint p3 = global_wifi.LocationFloorPoint_SCM_M3(floor_code.c_str(), fingers, count);
+    LPoint p1 = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
+    LPoint p2 = global_wifi.LocationFloorPoint_SCM_12(floor_code.c_str(), fingers, count);
+    LPoint p3 = global_wifi.LocationFloorPoint_SCM_21(floor_code.c_str(), fingers, count);
+    LPoint p4 = global_wifi.LocationFloorPoint_SCM_22(floor_code.c_str(), fingers, count);
 
     WifiMultiPoint ppp;
     memcpy(ppp.floor_code, p1.floor_code, strlen(p1.floor_code));
@@ -195,12 +196,16 @@ WifiMultiPoint doLocateTest(const char* bssids)
     ppp.x3 = p3.x;
     ppp.y3 = p3.y;
 
+    ppp.id4 = p4.pcode;
+    ppp.x4 = p4.x;
+    ppp.y4 = p4.y;
+
     return ppp;
 }
 
 ////////////////////////////////
 
-NavPoint    *GetPoint(int id)
+NavPoint *GetPoint(int id)
 {
     Node *nd = global_nav.GetPoint(id);
     NavPoint *pt = new NavPoint;

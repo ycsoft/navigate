@@ -34,7 +34,19 @@ void  toBigEndian(int& x)
  * \param floorNubmer
  * \return
  */
-int floorPCodeToGlobePCode(int floorCode, int floorNubmer)
+int floorPCodeToGlobePCode(int floorCode, int floorNumber)
 {
-    return GLOBAL_FLOOR_CODE_BASE * floorNubmer + floorCode;
+    if (floorCode < 0)
+    {
+        return floorCode;
+    }
+
+    if (floorNumber < 0)
+    {
+        return GLOBAL_FLOOR_CODE_BASE * floorNumber - floorCode;
+    }
+    else
+    {
+        return GLOBAL_FLOOR_CODE_BASE * floorNumber + floorCode;
+    }
 }

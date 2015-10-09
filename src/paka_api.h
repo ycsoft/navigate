@@ -53,6 +53,9 @@ typedef struct _Multi_Point_Wifi_ST
     int id3;
     double x3;
     double y3;
+    int id4;
+    double x4;
+    double y4;
     _Multi_Point_Wifi_ST() {
         memset(this, 0, sizeof(_Multi_Point_Wifi_ST));
     }
@@ -112,7 +115,7 @@ extern "C"
      * \param id
      * \return
      */
-    PRIVATE NavPoint    *GetPoint(int id);
+    PRIVATE NavPoint *GetPoint(int id);
 
 }
 
