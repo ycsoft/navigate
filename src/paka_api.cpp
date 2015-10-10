@@ -1,21 +1,28 @@
 ﻿
 #include "navigate.h"
 #include "paka_api.h"
-#include "wifi_location.h"
+#include "rssi_location.h"
 #include "navigate_defines.h"
-#include "navigate_defines.h"
+#include "location_master.h"
+#include "common.h"
 
 #include <map>
 #include <list>
 #include <vector>
-#include <cstring>
+#include <string>
 #include <iostream>
 #include <cmath>
 
 using namespace std;
 
 static Navigate global_nav;
-static WifiLocation global_wifi;
+static RssiLocation global_wifi;
+static LocationMaster global_location;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 路径规划
 
 PointArray loadPathInfo(const char *filepath)
 {
@@ -112,39 +119,41 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     return result;
 }
 
+// 路径规划结束
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 加入了惯性导航的室内定位
+
+bool initFloorLocationData(double scale, double nyAngle, const char *datapath)
+{
+    return global_location.initData(scale, nyAngle, datapath);
+}
+
+SidPoint doLocation(double x0, double y0, double almx, double almy, double almz, double rotx, double roty, double rotz, const char *signal_ids, SignalType sig_type, LocationCalType cal_type)
+{
+    return global_location.do_lacation_master(x0, y0, almx, almy, almz, rotx, roty, rotz, signal_ids, sig_type, cal_type);
+}
+
+// 加入了惯性导航的室内定位结束
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 旧的WIFI文件
+
 int loadWifiInfo(const char *filepath)
 {
-    return global_wifi.LoadWifiFile(filepath);
+    return global_wifi.LoadSignalFile(filepath);
 }
 
 
-// split the string
-vector<string> split(string str, string pattern)
-{
-     string::size_type pos;
-     vector<string> result;
-     str += pattern;//扩展字符串以方便操作
-     size_t size=str.size();
-
-     for(size_t i = 0; i < size; i++)
-     {
-         pos = str.find(pattern,i);
-         if (pos < size)
-         {
-             std::string s=str.substr(i, pos-i);
-             result.push_back(s);
-             i = pos+pattern.size() - 1;
-         }
-     }
-     return result;
-}
-
-
-WifiPoint doLocate(const char* bssids)
+SidPoint doLocate(const char* bssids)
 {
     string bssidstr = bssids;
     vector<string> macs = split(bssidstr, ";");
-    RealTimeFinger** fingers = new RealTimeFinger*[macs.size()];
+    RealTimeSignal** fingers = new RealTimeSignal*[macs.size()];
     int count = 0;
     for (size_t i = 0; i < macs.size(); ++i)
     {
@@ -152,14 +161,14 @@ WifiPoint doLocate(const char* bssids)
         vector<string> item = split(mac, ",");
         if (item.size() == 2)
         {
-            RealTimeFinger* ff = new RealTimeFinger(item[0], atoi(item[1].c_str()));
+            RealTimeSignal* ff = new RealTimeSignal(item[0], atoi(item[1].c_str()));
             fingers[count] = ff;
             count++;
         }
     }
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
-    LPoint p = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
-    WifiPoint pp;
+    LPoint p = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
+    SidPoint pp;
     pp.id = p.pcode;
     pp.x = p.x;
     pp.y = p.y;
@@ -171,7 +180,7 @@ WifiMultiPoint doLocateTest(const char* bssids)
 {
     string bssidstr = bssids;
     vector<string> macs = split(bssidstr, ";");
-    RealTimeFinger** fingers = new RealTimeFinger*[macs.size()];
+    RealTimeSignal** fingers = new RealTimeSignal*[macs.size()];
     int count = 0;
     for (size_t i = 0; i < macs.size(); ++i)
     {
@@ -179,7 +188,7 @@ WifiMultiPoint doLocateTest(const char* bssids)
         vector<string> item = split(mac, ",");
         if (item.size() == 2)
         {
-            RealTimeFinger* ff = new RealTimeFinger(item[0], atoi(item[1].c_str()));
+            RealTimeSignal* ff = new RealTimeSignal(item[0], atoi(item[1].c_str()));
             fingers[count] = ff;
             count++;
         }
@@ -187,9 +196,10 @@ WifiMultiPoint doLocateTest(const char* bssids)
     string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
 
     // 不同的计算方式
-    LPoint p1 = global_wifi.LocationFloorPoint_SCM_Normal(floor_code.c_str(), fingers, count);
-    LPoint p2 = global_wifi.LocationFloorPoint_SCM_M2(floor_code.c_str(), fingers, count);
-    LPoint p3 = global_wifi.LocationFloorPoint_SCM_M3(floor_code.c_str(), fingers, count);
+    LPoint p1 = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
+    LPoint p2 = global_wifi.LocationFloorPoint_SCM_12(floor_code.c_str(), fingers, count);
+    LPoint p3 = global_wifi.LocationFloorPoint_SCM_21(floor_code.c_str(), fingers, count);
+    LPoint p4 = global_wifi.LocationFloorPoint_SCM_22(floor_code.c_str(), fingers, count);
 
     WifiMultiPoint ppp;
     memcpy(ppp.floor_code, p1.floor_code, strlen(p1.floor_code));
@@ -206,12 +216,17 @@ WifiMultiPoint doLocateTest(const char* bssids)
     ppp.x3 = p3.x;
     ppp.y3 = p3.y;
 
+    ppp.id4 = p4.pcode;
+    ppp.x4 = p4.x;
+    ppp.y4 = p4.y;
+
     return ppp;
 }
 
-////////////////////////////////
+// 旧的wifi文件结束
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NavPoint    *GetPoint(int id)
+NavPoint *GetPoint(int id)
 {
     Node *nd = global_nav.GetPoint(id);
     NavPoint *pt = new NavPoint;
@@ -225,3 +240,4 @@ NavPoint    *GetPoint(int id)
     pt->attr = nd->attr;
     return pt;
 }
+

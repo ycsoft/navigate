@@ -23,8 +23,7 @@
 #define     UpStairs                12  //到楼上
 #define     DownStairs              -12 //到楼下
 
-#define     CloseToU               13  //就在跟前
-
+#define     CloseToU                13  //就在跟前
 
 #define     RightHandSys            1
 #define     LeftHandSys             -1
@@ -42,18 +41,19 @@
 
 #define     FloorFromID(ID)       ( (ID)/10000 )
 
-#define     GetTips(ID)           (ID == TurnLeft ? "左转": \
-                                        (ID == UpStairs ? "上楼": \
-                                        (ID == DownStairs ? "下楼": \
-                                        (ID == TurnRight ? "右转": \
-                                        (ID == WalkDirect? "直行" : \
-                                        (ID == WalkAlong ? "继续前行" : \
-                                        (ID == Arrive ? "到达": \
-                                        (ID == AlongLeft ? "靠左行走": \
-                                        (ID == AlongRight ? "靠右行走":"无法判断方向"))))))))   \
+#define     GetTips(ID)           (ID == TurnLeft ? "TurnLeft": \
+                                        (ID == UpStairs ? "UpStairs": \
+                                        (ID == DownStairs ? "DownStairs": \
+                                        (ID == TurnRight ? "TurnRight": \
+                                        (ID == WalkDirect? "WalkDirect" : \
+                                        (ID == WalkAlong ? "WalkAlong" : \
+                                        (ID == Arrive ? "Arrive": \
+                                        (ID == AlongLeft ? "AlongLeft": \
+                                        (ID == CloseToU ? "CloseToU": \
+                                        (ID == AlongRight ? "AlongRight":"unknown")))))))))   \
                                    )
 
-#define     INVALID_ID              -1  //无效的楼层编号
+#define     INVALID_ID             -1  //无效的点编号
 
 using namespace std;
 

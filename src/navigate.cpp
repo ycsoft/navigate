@@ -212,7 +212,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     }
     else{
-        //        cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
+        // cout<<"Finded and Path node cout:"<<_closeList.size()<<endl;
     }
     Node *nd = _closeList.front();
     if ( nd != end )
