@@ -90,19 +90,15 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
     return ret;
 }
 
-bool LocationMaster::initData(double scale, double nyAngle, const char *datapath)
+bool LocationMaster::initData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath)
 {
     m_scale = scale;
     m_nyAngle = nyAngle;
     // 分别加载蓝牙数据和wifi数据
-    string wfile = string(datapath) + "/" + kWifiFilename;
-    string bfile = string(datapath) + "/" + kBleFilename;
-    load_wifi_file(wfile.c_str());
-    load_ble_file(bfile.c_str());
+    load_wifi_file(wifidatapath);
+    load_ble_file(bledatapath);
     return true;
 }
-
-
 
 int LocationMaster::load_wifi_file(const char *filepath)
 {

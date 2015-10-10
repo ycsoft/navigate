@@ -41,7 +41,7 @@ PointArray getBestPath(NavPoint *start, NavPoint *end);
  * \param datapath 数据文件data目录地址
  * \return
  */
-bool initFloorLocationData(double scale, double nyAngle, const char *datapath);
+bool initFloorLocationData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath);
 
 /*!
  * \brief 加入了惯性导航的定位

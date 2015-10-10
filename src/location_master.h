@@ -43,11 +43,9 @@ public:
                               const char* signal_ids,
                               SignalType sig_type,
                               LocationCalType cal_type);
-    bool initData(double scale, double nyAngle, const char *datapath);
+    bool initData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath);
 
 private:
-
-
 
     // 读取wifi数据文件
     int load_wifi_file(const char* filepath);
