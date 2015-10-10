@@ -62,8 +62,8 @@ SidPoint doLocation(double x0, double y0,
                     double almx, double almy, double almz,
                     double rotx, double roty, double rotz,
                     const char* signal_ids,
-                    SignalType sig_type,
-                    LocationCalType cal_type);
+                    int sig_type,
+                    int cal_type);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 仅供WIFI测试用的函数
