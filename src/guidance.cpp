@@ -1,9 +1,9 @@
 #include <math.h>
 #include "guidance.h"
 
-guidance::guidance()
+Guidance::Guidance()
 {
-    m_northAngleDiff = 0.0;
+    m_nyAngle = 0.0;
 
     // 是否为一个新的周期
     m_newStep = false;
@@ -30,11 +30,13 @@ guidance::guidance()
 }
 
 // 进行一次计算
-void guidance::doProcess(double almx, double almy, double almz, double rotx, double roty, double rotz)
+void Guidance::doProcess(double almx, double almy, double almz,
+                         double rotx, double roty, double rotz,
+                         double *outx, double *outy)
 {
     rotx = rotx / 180.0 * 3.1415926;
     roty = roty / 180.0 * 3.1415926;
-    rotz = (rotz + m_northAngleDiff) / 180.0f* 3.1415926f;
+    rotz = (rotz + m_nyAngle) / 180.0f* 3.1415926f;
 
     if (almz > 1.0f)
     {
@@ -64,6 +66,11 @@ void guidance::doProcess(double almx, double almy, double almz, double rotx, dou
         m_rot_x_p = (m_rot_x_p * pn + rotx) / n;
         m_rot_y_p = (m_rot_y_p * pn + roty) / n;
         m_rot_z_p = (m_rot_z_p * pn + rotz) / n;
+
+        *outx = 0.0f;
+        *outy = 0.0f;
+
+        initData();
     }
 
     //一个行走周期结束
@@ -93,10 +100,14 @@ void guidance::doProcess(double almx, double almy, double almz, double rotx, dou
             dsx = dsm*(sin(m_rot_z_p)*sin(m_rot_x_p));
             dsy = dsm*(cos(m_rot_z_p)*sin(m_rot_x_p));
         }
+
+        *outx = dsx;
+        *outy = dsy;
     }
+    return;
 }
 
-void guidance::initData()
+void Guidance::initData()
 {
     // 计算中需要用到的中间量
     m_alm_x_p = 0.0f;
@@ -117,7 +128,7 @@ void guidance::initData()
 }
 
 // 返回最大值的索引
-int guidance::getMaxIndex(double a, double b, double c)
+int Guidance::getMaxIndex(double a, double b, double c)
 {
     if (a >= b && a >= c)
     {

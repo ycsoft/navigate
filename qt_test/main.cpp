@@ -111,7 +111,6 @@ void test_wifi_location_jduge_which_floor() {
     */
 }
 
-
 int main()
 {
    //test_wifi_location_read_file();
@@ -119,7 +118,7 @@ int main()
    loadWifiInfo("F:\\_temp\\wfinger.f");
    const char* bssids = "14759071f8b4,-44;bcd17798c642,-46;08107692b1a9,-48;20c9d0188cdc,-48;78d38dbcbc74,-55;9c216ae323a0,-55;80891724fed8,-59;78d38dbcbc78,-59;d0c7c00bbb5a,-59;54e6fc22046a,-59;202bc19f3639,-61;147590dc8346,-61;d0c7c08a440f,-79;b85510716928,-94;b85510716929,-94";
    WifiMultiPoint pp = doLocateTest(bssids);
+   printf("%d", pp.id1);
    //test_navigate();
    return 0;
 }
-

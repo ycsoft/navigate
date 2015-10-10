@@ -4,120 +4,98 @@
 #include <stdio.h>
 #include <string.h>
 
-#define     PRIVATE
+#include "location_defines.h"
 
-typedef double real;
-
-typedef struct _Point
-{
-    real    x;
-    real    y;
-    int     attr;
-    int     id;
-    int     type;
-    int     floor;
-    _Point() {
-        x = -1.0f;
-        y = -1.0f;
-        id = -1;
-        attr = -1;
-        type = -1;
-    }
-}NavPoint;
+#define PRIVATE
 
 
-#define LEN_FLOOR_CODE 32
-typedef struct _Point_Wifi_ST
-{
-    double x;
-    double y;
-    int id;
-    char floor_code[LEN_FLOOR_CODE];
-    _Point_Wifi_ST() {
-        x = -1.0f;
-        y = -1.0f;
-        id = -1;
-        memset(floor_code, 0, LEN_FLOOR_CODE);
-    }
-} WifiPoint;
-
-typedef struct _Multi_Point_Wifi_ST
-{
-    char floor_code[LEN_FLOOR_CODE];
-    int id1;
-    double x1;
-    double y1;
-    int id2;
-    double x2;
-    double y2;
-    int id3;
-    double x3;
-    double y3;
-    int id4;
-    double x4;
-    double y4;
-    _Multi_Point_Wifi_ST() {
-        memset(this, 0, sizeof(_Multi_Point_Wifi_ST));
-    }
-} WifiMultiPoint;
-
-
-typedef struct
-{
-    int       num;
-    NavPoint  *pts;
-}PointArray;
 
 class Navigate;
 
-extern "C"
-{
 
-    /*!
-     * \brief 加载路径文件,返回路径点数组
-     * \param filepath
-     * \return
-     */
-    PointArray loadPathInfo(const char *filepath);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 路径规划
+/*!
+ * \brief 加载路径文件,返回路径点数组
+ * \param filepath
+ * \return
+ */
+PointArray loadPathInfo(const char *filepath);
 
-    /*!
-     * \brief 根据给定的起点和终点进行路径规划
-     * \param start
-     * \param end
-     * \return
-     */
-    PointArray getBestPath(NavPoint *start, NavPoint *end);
+/*!
+ * \brief 根据给定的起点和终点进行路径规划
+ * \param start
+ * \param end
+ * \return
+ */
+PointArray getBestPath(NavPoint *start, NavPoint *end);
 
-    /*!
-     * \brief 加载wifi数据文件
-     * \param filepath
-     * \return 加载结果
-     */
-    int loadWifiInfo(const char *filepath);
 
-    /*!
-     * \brief 进行定位，返回定位结果
-     * \param bssids mac地址字符串：格式为 {mac字符串}，{信号强度}；{mac字符串}，{信号强度}；
-     * \return
-     */
-    WifiPoint doLocate(const char* bssids);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 室内定位
 
-    /*!
-     * \brief doLocateTest 测试函数，使用多种方法进行相似度计算定位
-     * \param bssids
-     * \return
-     */
-    WifiMultiPoint doLocateTest(const char* bssids);
+/*!
+ * \brief 初始化楼层定位数据, 需要传入比例尺, 正北与Y夹角, 数据文件路径等
+ * \param scale 比例尺, 一米对应多少像素
+ * \param nyAngle 正北与Y夹角
+ * \param datapath 数据文件data目录地址
+ * \return
+ */
+bool initFloorLocationData(double scale, double nyAngle, const char *datapath);
 
-    /*!
-     * \brief GetPoint
-     * 该函数仅供内部测试使用
-     * \param id
-     * \return
-     */
-    PRIVATE NavPoint *GetPoint(int id);
+/*!
+ * \brief 加入了惯性导航的定位
+ * \param x0 惯性导航用初始的X坐标
+ * \param y0 惯性导航用初始的Y坐标
+ * \param almx 线性加速度传感器值
+ * \param almy 线性加速度传感器值
+ * \param almz 线性加速度传感器值
+ * \param rotx 方位角
+ * \param roty 方位角
+ * \param rotz 方位角
+ * \param signal_ids 信号列表
+ * \param sig_type 信号类型
+ * \param cal_type 计算类型
+ * \return
+ */
+SidPoint doLocation(double x0, double y0,
+                    double almx, double almy, double almz,
+                    double rotx, double roty, double rotz,
+                    const char* signal_ids,
+                    SignalType sig_type,
+                    LocationCalType cal_type);
 
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 仅供WIFI测试用的函数
+
+/*!
+ * \brief 加载wifi数据文件
+ * \param filepath
+ * \return 加载结果
+ */
+int loadWifiInfo(const char *filepath);
+
+/*!
+ * \brief 进行定位，返回定位结果
+ * \param bssids mac地址字符串：格式为 {mac字符串}，{信号强度}；{mac字符串}，{信号强度}；
+ * \return
+ */
+SidPoint doLocate(const char* bssids);
+
+/*!
+ * \brief doLocateTest 测试函数，使用多种方法进行相似度计算定位
+ * \param bssids
+ * \return
+ */
+WifiMultiPoint doLocateTest(const char* bssids);
+
+/*!
+ * \brief GetPoint
+ * 该函数仅供内部测试使用
+ * \param id
+ * \return
+ */
+PRIVATE NavPoint *GetPoint(int id);
 
 
 #endif // NAVIGATELIB_H

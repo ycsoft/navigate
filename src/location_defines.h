@@ -11,6 +11,74 @@ using namespace std;
 #define MAC_LENTH 12
 
 
+////////////////////////////////
+// struct used for output
+
+typedef double real;
+
+typedef struct _Point
+{
+    real    x;
+    real    y;
+    int     attr;
+    int     id;
+    int     type;
+    int     floor;
+    _Point() {
+        x = -1.0f;
+        y = -1.0f;
+        id = -1;
+        attr = -1;
+        type = -1;
+    }
+}NavPoint;
+
+
+#define LEN_FLOOR_CODE 32
+
+typedef struct _Point_Sid_ST
+{
+    double x;
+    double y;
+    int id;
+    char floor_code[LEN_FLOOR_CODE];
+    _Point_Sid_ST() {
+        x = -1.0f;
+        y = -1.0f;
+        id = -1;
+        memset(floor_code, 0, LEN_FLOOR_CODE);
+    }
+} SidPoint;
+
+typedef struct _Multi_Point_Wifi_ST
+{
+    char floor_code[LEN_FLOOR_CODE];
+    int id1;
+    double x1;
+    double y1;
+    int id2;
+    double x2;
+    double y2;
+    int id3;
+    double x3;
+    double y3;
+    int id4;
+    double x4;
+    double y4;
+    _Multi_Point_Wifi_ST() {
+        memset(this, 0, sizeof(_Multi_Point_Wifi_ST));
+    }
+} WifiMultiPoint;
+
+typedef struct
+{
+    int       num;
+    NavPoint  *pts;
+}PointArray;
+
+// struct used for output end
+////////////////////////////////
+
 // 每层楼wifi列表的列表项结构体
 typedef struct Mac_List_Item_ST {
     int id;
@@ -38,7 +106,7 @@ typedef struct Gather_Finger_Item_ST {
         this->mac = _mac;
         this->rssi = _rssi;
     }
-}GatherFingerItem, RealTimeFinger;
+}GatherFingerItem, RealTimeSignal;
 
 typedef struct Point_ST {
     int pcode;
@@ -73,7 +141,7 @@ typedef struct Wifi_Floor_ST {
     map<string, MacListItem> all_mac_map;           // 所有的wifi map, 里面保存有mac地址出现过的最强强度点等信息
     map< int, GatherFingerInfo > finger_map;        // 每个测量点的wifi指纹，key为测量点编号，value为测量点的wifi指纹
     map<string, list<int> > mac_point_code_map;     // mac地址在哪些采集点曾出现过
-}FloorWifiInfo;
+}FloorSignalInfo;
 
 // 相似度计算结果结构体，同时返回每次不同的相似度
 typedef struct Similarity_Result_ST {
@@ -110,10 +178,20 @@ struct CalTemp
 
 // 相似度算法类型
 enum SimilarityCalType {
-    enum_11,
-    enum_12,
-    enum_21,
-    enum_22,
+    enum_simi_type_11,
+    enum_simi_type_12,
+    enum_simi_type_21,
+    enum_simi_type_22,
+};
+
+enum SignalType {
+    enum_sigtype_wifi = 1,
+    enum_sigtype_ble,
+};
+
+enum LocationCalType {
+    enum_pcal_type_location = 1,
+    enum_pcal_type_guidance = 2,
 };
 
 /*

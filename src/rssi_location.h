@@ -6,43 +6,43 @@
 #include <vector>
 #include <cstring>
 
-#include "wifi_location_defines.h"
+#include "location_defines.h"
 
 using namespace std;
 
-class WifiLocation
+class RssiLocation
 {
 public:
 
-    WifiLocation();
+    RssiLocation();
 
-    ~WifiLocation();
+    ~RssiLocation();
 
     // load the wifi file
-    int LoadWifiFile(const char* filepath);
+    int LoadSignalFile(const char* filepath);
 
     // judge which floor am I
-    string LocationBuildingFloor(RealTimeFinger* realdata[], int size);
+    string LocationBuildingFloor(RealTimeSignal* realdata[], int size);
 
     // 根据不同的方法判断在哪个点
-    LPoint LocationFloorPoint_SCM_11(const char* floor_code, RealTimeFinger* realdata[], int size);
-    LPoint LocationFloorPoint_SCM_12(const char* floor_code, RealTimeFinger* realdata[], int size);
-    LPoint LocationFloorPoint_SCM_21(const char* floor_code, RealTimeFinger* realdata[], int size);
-    LPoint LocationFloorPoint_SCM_22(const char* floor_code, RealTimeFinger* realdata[], int size);
+    LPoint LocationFloorPoint_SCM_11(const char* floor_code, RealTimeSignal* realdata[], int size);
+    LPoint LocationFloorPoint_SCM_12(const char* floor_code, RealTimeSignal* realdata[], int size);
+    LPoint LocationFloorPoint_SCM_21(const char* floor_code, RealTimeSignal* realdata[], int size);
+    LPoint LocationFloorPoint_SCM_22(const char* floor_code, RealTimeSignal* realdata[], int size);
 
 private:
 
     // judge which point am I in the floor
-    LPoint LocationFloorPoint(const char* floor_code, RealTimeFinger* realdata[], int size, SimilarityCalType calType);
+    LPoint LocationFloorPoint(const char* floor_code, RealTimeSignal* realdata[], int size, SimilarityCalType calType);
 
     // 将mac地址加入到曾经出现过的点列表中
     int addMacToAppearPointCodeMapList(string mac, int point_code, map<string, list<int> > &mac_point_code_map);
 
     // 计算传入的wifi数据与楼层wifi列表的相似度
-    int calSimilarityInBuildingFloor(RealTimeFinger* fingers[], int size, FloorWifiInfo &finfo);
+    int calSimilarityInBuildingFloor(RealTimeSignal* fingers[], int size, FloorSignalInfo &finfo);
 
     // 计算传入的wifi数据与采集点指纹的相似度
-    Similarities calSimilarityInFloorGatherCode(RealTimeFinger* fingers[], int size, GatherFingerInfo &ginfo);
+    Similarities calSimilarityInFloorGatherCode(RealTimeSignal* realdata[], int size, GatherFingerInfo &ginfo);
 
     // 相似度比较方法2
     inline float calSimilarity_M2(int &rssi_in, int &rssi_f);
@@ -51,16 +51,16 @@ private:
     inline float calSimilarity_M3(int &rssi_in, int &rssi_f, int index_f);
 
     // 计算可能的点，缩小进行相似度比较的采集点范围
-    set<int> calPossiblePoints(RealTimeFinger* fingers[], int size, map<string, list<int> > &mac_point_code_map);
+    set<int> calPossiblePoints(RealTimeSignal* realdata[], int size, map<string, list<int> > &mac_point_code_map);
 
     // 得到最相似点
-    int getMostSimilarPointCode(RealTimeFinger* fingers[], int size,
-                                map< int, GatherFingerInfo > &finger_map, set<int> &points,
+    int getMostSimilarPointCode(RealTimeSignal* realdata[], int size,
+                                map< int, GatherFingerInfo > &signal_map, set<int> &points,
                                 SimilarityCalType calType);
 
     // 得到相似点列表，按照相似度排序
-    vector<SPointTemp> getSimilarPointCodeList(RealTimeFinger* fingers[], int size,
-                                               map< int, GatherFingerInfo > &finger_map,
+    vector<SPointTemp> getSimilarPointCodeList(RealTimeSignal* realdata[], int size,
+                                               map< int, GatherFingerInfo > &signal_map,
                                                set<int> &points,
                                                SimilarityCalType calType);
 
@@ -68,8 +68,8 @@ private:
     LPoint calFloorPointLocation(vector<SPointTemp> vecSpt);
 
     // 比较复杂的得到相似点后计算XY坐标
-    LPoint calFloorPointLocation(RealTimeFinger* fingers[], int size, vector<SPointTemp> vecSpt,
-                                 map< int, GatherFingerInfo > &finger_map,
+    LPoint calFloorPointLocation(RealTimeSignal* fingers[], int size, vector<SPointTemp> vecSpt,
+                                 map< int, GatherFingerInfo > &signal_map,
                                  map<string, MacListItem> &max_rssi_point_map);
 
 private:
@@ -82,7 +82,7 @@ private:
 
 private:
     // 保存楼宇中每个楼层的wifi数据
-    map<string, FloorWifiInfo> m_building_wifi_info;
+    map<string, FloorSignalInfo> m_building_signal_info;
 
 };
 #endif // WIFI_LOCATION_H

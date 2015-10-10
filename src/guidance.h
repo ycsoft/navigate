@@ -2,12 +2,14 @@
 #define GUIDANCE_H
 
 
-class guidance
+class Guidance
 {
 public:
 
-    guidance();
-    void doProcess(double almx, double almy, double almz, double rotx, double roty, double rotz);
+    Guidance();
+    void doProcess(double almx, double almy, double almz,
+                   double rotx, double roty, double rotz,
+                   double *outx, double *outy);
 
 private:
 
@@ -19,7 +21,7 @@ private:
 
     // 地图Y轴与地球正北方夹角
     // Y轴在N顺时针为负值, 画地图时可确定
-    double m_northAngleDiff;
+    double m_nyAngle;
 
     // 是否为一个新的周期
     bool m_newStep;
