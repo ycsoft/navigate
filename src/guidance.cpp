@@ -3,7 +3,7 @@
 
 Guidance::Guidance()
 {
-    m_nyAngle = 0.0;
+    m_nyAngle = 90.0;
 
     // 是否为一个新的周期
     m_newStep = false;
@@ -30,13 +30,17 @@ Guidance::Guidance()
 }
 
 // 进行一次计算
+// 计算中使用线性加速度传感器的值，入参是加速度
+// 计算使用弧度值  （弧度= 角度 / 180 * 3.1415926），入参是角度值
 void Guidance::doProcess(double almx, double almy, double almz,
                          double rotx, double roty, double rotz,
                          double *outx, double *outy)
 {
-    rotx = rotx / 180.0 * 3.1415926;
-    roty = roty / 180.0 * 3.1415926;
-    rotz = (rotz + m_nyAngle) / 180.0f* 3.1415926f;
+    rotx = rotx / 180.0f * 3.1415926f;
+    roty = roty / 180.0f * 3.1415926f;
+    rotz = (rotz + m_nyAngle) / 180.0f * 3.1415926f;
+
+    almz = 9.6 * cos(rotx); // 加速度传感器 Z 去重力
 
     if (almz > 1.0f)
     {
@@ -69,40 +73,19 @@ void Guidance::doProcess(double almx, double almy, double almz,
 
         *outx = 0.0f;
         *outy = 0.0f;
-
-        initData();
     }
 
     //一个行走周期结束
     if (almz < -1.0f && m_newStep == true)
     {
-        m_newStep = false;
-        m_sc = 0;
-
-        int imax = getMaxIndex(m_sgm2_x, m_sgm2_y, m_sgm2_z);
-
         double dsx = 0.0f;
         double dsy = 0.0f;
-
         double dsm = 0.6f;
-        if (imax == 0)
-        {
-            dsx = dsm*(cos(m_rot_y_p)*cos(m_rot_z_p));
-            dsy =-dsm*(sin(m_rot_z_p)*cos(m_rot_y_p));
-        }
-        else if (imax == 1)
-        {
-            dsx = dsm*(sin(m_rot_z_p)*cos(m_rot_x_p));
-            dsy = dsm*(cos(m_rot_z_p)*cos(m_rot_x_p));
-        }
-        else
-        {
-            dsx = dsm*(sin(m_rot_z_p)*sin(m_rot_x_p));
-            dsy = dsm*(cos(m_rot_z_p)*sin(m_rot_x_p));
-        }
-
+        dsx = dsm*(sin(m_rot_z_p));
+        dsy = dsm*(cos(m_rot_z_p));
         *outx = dsx;
         *outy = dsy;
+        initData();
     }
     return;
 }
@@ -125,6 +108,9 @@ void Guidance::initData()
     m_rot_x_p = 0.0f;
     m_rot_y_p = 0.0f;
     m_rot_z_p = 0.0f;
+
+    m_newStep = false;
+    m_sc = 0;
 }
 
 // 返回最大值的索引

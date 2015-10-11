@@ -16,7 +16,7 @@ const string kBleFilename = "bfinger.f";
 
 LocationMaster::LocationMaster()
 {
-    m_scale = 0;
+    m_scale = 1;
     m_nyAngle = 0;
     memset(&m_last_floor_code, 0, LEN_FLOOR_CODE);
     m_last_floor_number = 0;
