@@ -31,6 +31,9 @@ int globePointToFloorNumber(int globePointCode);
 // split the string
 vector<string> split(string str, string pattern);
 
+// 计算两点距离
+double calTwoPointDistance(double x1, double y1, double x2, double y2);
+
 
 #endif // COMMON_H
 

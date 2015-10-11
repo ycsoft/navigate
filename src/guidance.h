@@ -14,15 +14,9 @@ public:
 private:
 
     void initData();
-
     int getMaxIndex(double a, double b, double c);
 
 private:
-
-    // 地图Y轴与地球正北方夹角
-    // Y轴在N顺时针为负值, 画地图时可确定
-    double m_nyAngle;
-
     // 是否为一个新的周期
     bool m_newStep;
 
@@ -45,6 +39,11 @@ private:
 
     // 步数
     double m_sc;
+
+public:
+    // 地图Y轴与地球正北方夹角
+    // Y轴在N顺时针为负值, 画地图时可确定
+    double m_nyAngle;
 
 };
 

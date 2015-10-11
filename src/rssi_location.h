@@ -73,8 +73,6 @@ private:
                                  map<string, MacListItem> &max_rssi_point_map);
 
 private:
-    // 计算两点距离
-    inline double calTwoPointDistance(double x1, double y1, double x2, double y2);
 
     double calDistanceStandardDeviation(vector<CalTemp> &);
 

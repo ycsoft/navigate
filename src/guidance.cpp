@@ -3,7 +3,7 @@
 
 Guidance::Guidance()
 {
-    m_nyAngle = 90.0;
+    m_nyAngle = 0.0f;
 
     // 是否为一个新的周期
     m_newStep = false;

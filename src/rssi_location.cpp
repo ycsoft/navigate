@@ -746,12 +746,6 @@ LPoint RssiLocation::calFloorPointLocation(RealTimeSignal *fingers[], int size, 
     return ret;
 }
 
-// 计算两点距离
-double RssiLocation::calTwoPointDistance(double x1, double y1, double x2, double y2)
-{
-    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-}
-
 // 计算距离的标准偏差
 double RssiLocation::calDistanceStandardDeviation(vector<CalTemp> &data)
 {
