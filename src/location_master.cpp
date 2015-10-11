@@ -19,6 +19,8 @@ LocationMaster::LocationMaster()
     m_scale = 1;
     memset(&m_last_floor_code, 0, LEN_FLOOR_CODE);
     m_last_floor_number = 0;
+    m_lastPoint.x = -99.0f;
+    m_lastPoint.y = -99.0f;
 }
 
 /*!
@@ -60,20 +62,24 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         memcpy(&m_last_floor_code, ret.floor_code, LEN_FLOOR_CODE);
         m_last_floor_number = globePointToFloorNumber(ret.id);
 
-        // 此处的XY已经是像素
-        // 点校正
-        // 1. 求新旧两点的像素距离
-        double dis = calTwoPointDistance(ret.x, ret.y, m_lastPoint.x, m_lastPoint.y);
-        if (dis > kMaxDiff * m_scale)
+
+        if (m_lastPoint.x > 0.0f && m_lastPoint.y > 0.0f)
         {
-            // 舍弃WIFI得到的点坐标
-            ret.x = m_lastPoint.x;
-            ret.y = m_lastPoint.y;
-        }
-        else
-        {
-            ret.x = (ret.x + m_lastPoint.x) / 2.0f;
-            ret.y = (ret.x + m_lastPoint.y) / 2.0f;
+            // 此处的XY已经是像素
+            // 点校正
+            // 1. 求新旧两点的像素距离
+            double dis = calTwoPointDistance(ret.x, ret.y, m_lastPoint.x, m_lastPoint.y);
+            if (dis > kMaxDiff * m_scale)
+            {
+                // 舍弃WIFI得到的点坐标
+                ret.x = m_lastPoint.x;
+                ret.y = m_lastPoint.y;
+            }
+            else
+            {
+                ret.x = (ret.x + m_lastPoint.x) / 2.0f;
+                ret.y = (ret.y + m_lastPoint.y) / 2.0f;
+            }
         }
     }
     else // 惯性导航
@@ -94,12 +100,14 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         ret.y = yn;
         ret.id = 0;
         memcpy(&ret.floor_code, m_last_floor_code, LEN_FLOOR_CODE);
+
+        // 将点加入到队列中, 以作为后期粗大点剔除使用
+        // 保存上一个点
+        m_lastPoint.x = ret.x;
+        m_lastPoint.y = ret.y;
+        m_lastPoint.floor_num = m_last_floor_number;
     }
-    // 将点加入到队列中, 以作为后期粗大点剔除使用
-    // 保存上一个点
-    m_lastPoint.x = ret.x;
-    m_lastPoint.y = ret.y;
-    m_lastPoint.floor_num = m_last_floor_number;
+
 
     return ret;
 }

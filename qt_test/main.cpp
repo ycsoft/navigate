@@ -114,13 +114,12 @@ void test_wifi_location_jduge_which_floor() {
 }
 
 void test_guidance() {
-    ifstream in("d:\\dg-2-log-in.txt");
+    ifstream in("d:\\dg-5-log-in.txt");
     string line;
-    double x0 = 0.0f;
-    double y0 = 0.0f;
+    double x0 = 1222.886841f;
+    double y0 = 733.241088867187f;
 
-
-    ofstream out("d:\\dg-2-log-out.txt");
+    ofstream out("d:\\dg-5-log-out.txt");
     while(getline(in, line)) {
         // cout << line << endl;
         vector<string> s =  split(line, ",");

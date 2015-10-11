@@ -40,12 +40,11 @@ void Guidance::doProcess(double almx, double almy, double almz,
     roty = roty / 180.0f * 3.1415926f;
     rotz = (rotz + m_nyAngle) / 180.0f * 3.1415926f;
 
-    almz = almz * cos(rotx); // 加速度传感器 Z 去重力
+    almz = almz - 9.81 * cos(rotx); // 加速度传感器 Z 去重力
 
     if (almz > 1.0f)
     {
         m_newStep = true;
-        m_sc = 0;
     }
 
     if (m_newStep == true)
