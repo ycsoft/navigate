@@ -1,10 +1,12 @@
 ﻿#include <iostream>
+#include <fstream>
 #include <vector>
 #include <cstring>
 #include <list>
 
 #include "../src/paka_api.h"
 #include "../src/navigate_defines.h"
+#include "../src/common.h"
 using namespace std;
 
 void test( int id1, int id2 )
@@ -111,8 +113,37 @@ void test_wifi_location_jduge_which_floor() {
     */
 }
 
+void test_guidance() {
+    ifstream in("d:\\dg-2-log-in.txt");
+    string line;
+    double x0 = 0.0f;
+    double y0 = 0.0f;
+
+
+    ofstream out("d:\\dg-2-log-out.txt");
+    while(getline(in, line)) {
+        // cout << line << endl;
+        vector<string> s =  split(line, ",");
+
+        double almx = atof(s[0].c_str());
+        double almy = atof(s[1].c_str());
+        double almz = atof(s[2].c_str());
+        double rotx = atof(s[3].c_str());
+        double roty = atof(s[4].c_str());
+        double rotz = atof(s[5].c_str());
+        SidPoint p = doLocation(x0, y0, almx, almy, almz, rotx, roty, rotz, "", -1, 2);
+        cout << p.x << "  " << p.y << endl;
+        out << p.x << "\t" << p.y << endl;
+        x0 = p.x;
+        y0 = p.y;
+    }
+}
+
+
 int main()
 {
+    test_guidance();
+    return 1;
    //test_wifi_location_read_file();
    //test_wifi_location_jduge_which_floor();
    loadWifiInfo("F:\\_temp\\wfinger.f");
