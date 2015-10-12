@@ -31,15 +31,16 @@ Guidance::Guidance()
 
 // 进行一次计算
 // 计算中使用线性加速度传感器的值，入参是加速度
-// 计算使用弧度值  （弧度= 角度 / 180 * 3.1415926），入参是角度值
+// 计算使用弧度值  （弧度= 角度 / 180 * 3.1415926），入参也为弧度值
 void Guidance::doProcess(double almx, double almy, double almz,
                          double rotx, double roty, double rotz,
                          double *outx, double *outy)
 {
-    rotx = rotx / 180.0f * 3.1415926f;
-    roty = roty / 180.0f * 3.1415926f;
-    rotz = (rotz + m_nyAngle) / 180.0f * 3.1415926f;
 
+    // rotx = rotx / 180.0f * 3.1415926f;
+    // roty = roty / 180.0f * 3.1415926f;
+    //  rotz = (rotz + m_nyAngle) / 180.0f * 3.1415926f;
+    rotz = rotz + m_nyAngle / 180.f * 3.1415926f;
     almz = almz - 9.81 * cos(rotx); // 加速度传感器 Z 去重力
 
     if (almz > 1.0f)
