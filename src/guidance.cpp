@@ -43,7 +43,7 @@ void Guidance::doProcess(double almx, double almy, double almz,
 
     // 如果大于180， 360-x, 如果不是，直接用
 
-    rotz = 3.1415926 - (rotz - m_nyAngle / 180.f * 3.1415926f);
+    rotz = 3.1415926f - (rotz - m_nyAngle / 180.f * 3.1415926f);
     almz = almz - 9.81 * cos(rotx); // 加速度传感器 Z 去重力
 
     if (almz > 1.0f)
