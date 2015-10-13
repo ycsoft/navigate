@@ -41,7 +41,7 @@ PointArray getBestPath(NavPoint *start, NavPoint *end);
  * \param datapath 数据文件data目录地址
  * \return
  */
-bool initFloorLocationData(double scale, double nyAngle, const char *datapath);
+bool initFloorLocationData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath);
 
 /*!
  * \brief 加入了惯性导航的定位
@@ -62,8 +62,8 @@ SidPoint doLocation(double x0, double y0,
                     double almx, double almy, double almz,
                     double rotx, double roty, double rotz,
                     const char* signal_ids,
-                    SignalType sig_type,
-                    LocationCalType cal_type);
+                    int sig_type,
+                    int cal_type);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 仅供WIFI测试用的函数

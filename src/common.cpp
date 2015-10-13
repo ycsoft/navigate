@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include "common.h"
 
 /*!
@@ -81,4 +82,10 @@ vector<string> split(string str, string pattern)
          }
      }
      return result;
+}
+
+// 计算两点的距离
+double calTwoPointDistance(double x1, double y1, double x2, double y2)
+{
+    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }

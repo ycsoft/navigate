@@ -8,18 +8,19 @@
 
 using namespace std;
 
-// 用于数据处理的点队列长度
-const int kQueSize = 15;
+// 惯性定位点和接下来的WIFI定位点, 最大的距离差, 单位米
+const double kMaxDiff = 5;
 // 蓝牙文件和wifi文件的文件名
 const string kWifiFilename = "wfinger.f";
 const string kBleFilename = "bfinger.f";
 
 LocationMaster::LocationMaster()
 {
-    m_scale = 0;
-    m_nyAngle = 0;
+    m_scale = 1;
     memset(&m_last_floor_code, 0, LEN_FLOOR_CODE);
     m_last_floor_number = 0;
+    m_lastPoint.x = -99.0f;
+    m_lastPoint.y = -99.0f;
 }
 
 /*!
@@ -45,7 +46,7 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
 {
     SidPoint ret;
     // 根据蓝牙信号和WIFI信号进行定位
-    if (cal_type == enum_pcal_type_location)
+    if (cal_type == enum_pcal_type_location || cal_type == enum_pcal_type_forcelocation)
     {
         // wifi
         if (sig_type == enum_sigtype_wifi)
@@ -60,6 +61,25 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         // 保存楼层序号和自然楼层编号
         memcpy(&m_last_floor_code, ret.floor_code, LEN_FLOOR_CODE);
         m_last_floor_number = globePointToFloorNumber(ret.id);
+
+        if (cal_type == enum_pcal_type_location && m_lastPoint.x > 0.0f && m_lastPoint.y > 0.0f)
+        {
+            // 此处的XY已经是像素
+            // 点校正
+            // 1. 求新旧两点的像素距离
+            double dis = calTwoPointDistance(ret.x, ret.y, m_lastPoint.x, m_lastPoint.y);
+            if (dis > kMaxDiff * m_scale)
+            {
+                // 舍弃WIFI得到的点坐标
+                ret.x = m_lastPoint.x;
+                ret.y = m_lastPoint.y;
+            }
+            else
+            {
+                ret.x = (ret.x + m_lastPoint.x) / 2.0f;
+                ret.y = (ret.y + m_lastPoint.y) / 2.0f;
+            }
+        }
     }
     else // 惯性导航
     {
@@ -79,30 +99,27 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         ret.y = yn;
         ret.id = 0;
         memcpy(&ret.floor_code, m_last_floor_code, LEN_FLOOR_CODE);
-    }
-    // 将点加入到队列中, 以作为后期粗大点剔除使用
 
-    QuePoint pp;
-    pp.x = ret.x;
-    pp.y = ret.y;
-    pp.floor_num = m_last_floor_number;
-    addPoints(pp);
+        // 将点加入到队列中, 以作为后期粗大点剔除使用
+        // 保存上一个点
+        m_lastPoint.x = ret.x;
+        m_lastPoint.y = ret.y;
+        m_lastPoint.floor_num = m_last_floor_number;
+    }
+
+
     return ret;
 }
 
-bool LocationMaster::initData(double scale, double nyAngle, const char *datapath)
+bool LocationMaster::initData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath)
 {
     m_scale = scale;
-    m_nyAngle = nyAngle;
+    m_guidance.m_nyAngle = nyAngle;
     // 分别加载蓝牙数据和wifi数据
-    string wfile = string(datapath) + "/" + kWifiFilename;
-    string bfile = string(datapath) + "/" + kBleFilename;
-    load_wifi_file(wfile.c_str());
-    load_ble_file(bfile.c_str());
+    load_wifi_file(wifidatapath);
+    load_ble_file(bledatapath);
     return true;
 }
-
-
 
 int LocationMaster::load_wifi_file(const char *filepath)
 {
@@ -190,12 +207,3 @@ void LocationMaster::realDistanceToPixel(double rdx, double rdy, double *pdx, do
     *pdy = rdy * m_scale;
 }
 
-void LocationMaster::addPoints(QuePoint p)
-{
-    m_quePoints.push(p);
-    // 保证只有15个
-    while (m_quePoints.size() > kQueSize)
-    {
-        m_quePoints.pop();
-    }
-}

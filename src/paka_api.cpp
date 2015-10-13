@@ -20,7 +20,6 @@ static RssiLocation global_wifi;
 static LocationMaster global_location;
 
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 路径规划
 
@@ -126,19 +125,18 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 加入了惯性导航的室内定位
 
-bool initFloorLocationData(double scale, double nyAngle, const char *datapath)
+bool initFloorLocationData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath)
 {
-    return global_location.initData(scale, nyAngle, datapath);
+    return global_location.initData(scale, nyAngle, wifidatapath, bledatapath);
 }
 
-SidPoint doLocation(double x0, double y0, double almx, double almy, double almz, double rotx, double roty, double rotz, const char *signal_ids, SignalType sig_type, LocationCalType cal_type)
+SidPoint doLocation(double x0, double y0, double almx, double almy, double almz, double rotx, double roty, double rotz, const char *signal_ids, int sig_type, int cal_type)
 {
-    return global_location.do_lacation_master(x0, y0, almx, almy, almz, rotx, roty, rotz, signal_ids, sig_type, cal_type);
+    return global_location.do_lacation_master(x0, y0, almx, almy, almz, rotx, roty, rotz, signal_ids, (SignalType)sig_type, (LocationCalType)cal_type);
 }
 
 // 加入了惯性导航的室内定位结束
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 旧的WIFI文件

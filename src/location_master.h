@@ -1,7 +1,7 @@
 #ifndef LOCATION_MASTER_H
 #define LOCATION_MASTER_H
 
-#include <queue>
+#include <vector>
 
 #include "location_defines.h"
 #include "rssi_location.h"
@@ -43,11 +43,9 @@ public:
                               const char* signal_ids,
                               SignalType sig_type,
                               LocationCalType cal_type);
-    bool initData(double scale, double nyAngle, const char *datapath);
+    bool initData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath);
 
 private:
-
-
 
     // 读取wifi数据文件
     int load_wifi_file(const char* filepath);
@@ -66,16 +64,10 @@ private:
     // 真实距离到像素
     void realDistanceToPixel(double rdx, double rdy, double *pdx, double *pdy);
 
-    void addPoints(QuePoint p);
-
 public:
     // 比例尺, 从米到像素
     // 1米对应多少像素
     double m_scale;
-
-    // 地图Y轴与地球正北方夹角
-    // Y轴在N顺时针为负值, 画地图时可确定
-    double m_nyAngle;
 
 private:
 
@@ -85,7 +77,8 @@ private:
     RssiLocation m_ble_location;
     Guidance m_guidance;
 
-    queue<QuePoint> m_quePoints;
+    // 保存上一个点, 用与去除粗大点
+    QuePoint m_lastPoint;
 
     // 上一次进行WIFI定位或者蓝牙定位得到的楼层编号和楼层自然序号信息
     char m_last_floor_code[LEN_FLOOR_CODE];
