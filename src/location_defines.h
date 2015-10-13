@@ -192,6 +192,7 @@ enum SignalType {
 enum LocationCalType {
     enum_pcal_type_location = 1,
     enum_pcal_type_guidance = 2,
+    enum_pcal_type_forcelocation = 3,
 };
 
 /*

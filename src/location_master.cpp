@@ -46,7 +46,7 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
 {
     SidPoint ret;
     // 根据蓝牙信号和WIFI信号进行定位
-    if (cal_type == enum_pcal_type_location)
+    if (cal_type == enum_pcal_type_location || cal_type == enum_pcal_type_forcelocation)
     {
         // wifi
         if (sig_type == enum_sigtype_wifi)
@@ -62,8 +62,7 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         memcpy(&m_last_floor_code, ret.floor_code, LEN_FLOOR_CODE);
         m_last_floor_number = globePointToFloorNumber(ret.id);
 
-
-        if (m_lastPoint.x > 0.0f && m_lastPoint.y > 0.0f)
+        if (cal_type == enum_pcal_type_location && m_lastPoint.x > 0.0f && m_lastPoint.y > 0.0f)
         {
             // 此处的XY已经是像素
             // 点校正
