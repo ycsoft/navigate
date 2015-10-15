@@ -58,11 +58,11 @@ void test_any(int x, int y, int floornumber, int id2)
 
 void test_navigate() {
     //加载地图路径点文件
-    loadPathInfo("F:\\mg(xn).i2");
+    loadPathInfo("F:\\_temp\\mg(xhss).i2");
 
-    // test_any(1083, 590, 3, 30001);
+    test_any(800, 700, 1, 10249);
 
-    test(30083,-10018);
+   // test(30083,-10018);
     cout<<endl;
     /*
     //设置导航起点与终点
@@ -141,8 +141,8 @@ void test_guidance() {
 
 int main()
 {
-    test_guidance();
-    return 1;
+   test_navigate();
+   return 1;
    //test_wifi_location_read_file();
    //test_wifi_location_jduge_which_floor();
    loadWifiInfo("F:\\_temp\\wfinger.f");
@@ -152,3 +152,6 @@ int main()
    //test_navigate();
    return 0;
 }
+
+
+

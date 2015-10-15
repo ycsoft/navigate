@@ -53,7 +53,8 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     if ( INVALID_ID ==  start->id)
     {
         nstart = global_nav.FindTagPoint(start,end);
-    }else
+    }
+    else
     {
         nstart = global_nav.GetPoint(start->id);
     }
