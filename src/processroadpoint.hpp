@@ -68,7 +68,6 @@ public:
                 {
                     ElemType *nd = (*viter);
                     nd->g = Distance(nd,pre);
-                    cout<<"ID:"<<nd->id<<" Distance:"<<nd->g<<endl;
                     midpts.push_back(*(_id2points[(*viter)->id]));
                 }
                 ++viter;
@@ -77,17 +76,12 @@ public:
             if ( midpts.size() > 0)
             {
                 midpts.sort();
-            cout<<"===================="<<endl;
-            list<ElemType>::iterator it = midpts.begin();
-            while( it != midpts.end())
-            {
-                cout<<"Sorted ID: "<<(*it).id<<" Distance:"<<(*it).g<<endl;
-                finalResult.push_back(_id2points[(*it).id]);
-                ++it;
-            }
-            cout<<"Sort Over"<<endl;
-
-    //        mergelist(finalResult,midpts);
+                list<ElemType>::iterator it = midpts.begin();
+                while( it != midpts.end())
+                {
+                    finalResult.push_back(_id2points[(*it).id]);
+                    ++it;
+                }
             }
 
             finalResult.push_back(cur);
