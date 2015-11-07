@@ -4,6 +4,7 @@
 #include "navigate_defines.h"
 #include "location_master.h"
 #include "common.h"
+#include "processroadpoint.hpp"
 
 #include <map>
 #include <list>
@@ -47,21 +48,21 @@ PointArray loadPathInfo(const char *filepath)
 PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
     Node *nstart = NULL, *nend = NULL;
+    Node n1,n2;
     PointArray result;
     memset(&result,0,sizeof(PointArray));
+    typeTrans(n1,*start);
+    typeTrans(n2,*end);
+    start->floor = n1.floor;
+    end->floor = n2.floor;
     //判断传入的点是否为标记点，进行必要的定位起始点工作
-    if ( INVALID_ID ==  start->id)
+    ProcessRoadPoint<Node> proc(global_nav._id2points,global_nav.__points);
+    nstart  = proc.findNearTagPoint(&n1,&n2,ProcessRoadPoint<Node>::Start);
+    nend    = proc.findNearTagPoint(&n1,&n2,ProcessRoadPoint<Node>::End);
+
+    if ( nend == NULL || nstart == NULL)
     {
-        nstart = global_nav.FindTagPoint(start,end);
-    }
-    else
-    {
-        nstart = global_nav.GetPoint(start->id);
-    }
-    nend = global_nav.GetPoint(end->id);
-    if ( nend == NULL )
-    {
-        cerr<<"目标点为空"<<endl;
+        cerr<<"导航点为空"<<endl;
         return result;
     }
 
