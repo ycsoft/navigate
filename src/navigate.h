@@ -2,6 +2,7 @@
 #define NAVIGATE_H
 
 #include "navigate_defines.h"
+#include "processroadpoint.hpp"
 
 #include <vector>
 #include <list>
@@ -14,7 +15,7 @@ class Navigate
 {
 public:
     typedef Node Vec;
-
+    friend class ProcessRoadPoint<Node>;
     enum PtTyle {Common = 1,Endian,Bind};
     Navigate();
     ~Navigate();
@@ -149,17 +150,19 @@ protected:
     void RemoveFromCloseList(Node*nd);
     //跟新方向信息
     void UpdateDirect(list<Node*> &path);
-private:
+public:
     vector<Node*>  __points;
+    //ID --Points对应表
+    map<int,Node*> _id2points;
+
+private:
+
 
     //开放列表
     list<Node*>  _openList;
 
     //封闭列表
     list<Node*>  _closeList;
-
-    //ID --Points对应表
-    map<int,Node*> _id2points;
     map<int,list<int> >  _floor_binds;
 
     //楼层间的连接点

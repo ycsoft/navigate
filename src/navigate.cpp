@@ -125,17 +125,17 @@ void Navigate::LoadPointsFile(const char *file)
 list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 {
     ClearResult();
-
     bool    bfinded = true;
     list<Node*> result;
     list<Node*> finalResult;
+    ProcessRoadPoint<Node> proc(_id2points,__points);
     if ( start == NULL || end == NULL )
     {
         return result;
     }
 
     //起点终点相同，不予导航
-    if (start->id == end->id)
+    if (start->id == end->id && start->id != INVALID_ID)
     {
         return result;
     }
@@ -236,7 +236,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     UpdateDirect(result);
 
     //////////////////将路径端点的中间点加入，便于绘制实际路线/////////////////////
-    ProcessRoadPoint<Node> proc(_id2points,__points);
+
     finalResult = proc.Process(result);
 
     return finalResult;
@@ -547,11 +547,13 @@ Node *Navigate::FindTagPoint(void *st, void *ed)
     if ( INVALID_ID == start->id )
     {
         floor = start->floor;
+        int i = 0;
         while ( piter != __points.end() )
         {
             if ( FloorFromID((*piter)->id) != floor )
             {
                 ++piter;
+                ++i;
                 continue;
             }
             real dis = Distance(start,*piter) + Distance(start,end);
@@ -561,6 +563,7 @@ Node *Navigate::FindTagPoint(void *st, void *ed)
                 res = (*piter);
             }
             ++piter;
+            ++i;
         }
 
     }else
