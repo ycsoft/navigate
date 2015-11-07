@@ -1,8 +1,10 @@
 ﻿#ifndef PROCESSROADPOINT_H
 #define PROCESSROADPOINT_H
 
-#include "../../src/location_defines.h"
-#include "../../src/navigate_defines.h"
+#include "location_defines.h"
+#include "navigate_defines.h"
+
+#include "navigate.h"
 
 #include <map>
 #include <list>
@@ -16,20 +18,17 @@ using namespace std;
  */
 
 template<typename ElemType>
-/**
- * @brief The ProcessRoadPoint class
- *
- *处理地图数据点，导航结果中不应只包含路口点，应将路口之间的数据点
- * 输出至结果路径中，以便于APP使用该数据构建准确的路径
- *
- */
+
 class ProcessRoadPoint
 {
+    friend class Navigate;
 public:
-    explicit ProcessRoadPoint( map<int,ElemType*> data ,vector<ElemType*> pts)
+    //寻找点的依据，离起点近 or 离终点近
+    enum  FindType{ Start, End};
+    explicit ProcessRoadPoint( map<int,ElemType*> &data ,vector<ElemType*> &pts)
+        :__points(pts),_id2points(data)
     {
-        __points = pts;
-        _id2points = data;
+
     }
 
     explicit ProcessRoadPoint(ProcessRoadPoint &p)
@@ -90,6 +89,76 @@ public:
         }
         return finalResult;
     }
+    ElemType *findNearTagPoint(ElemType *start,ElemType *end,FindType tp)
+    {
+
+        ElemType    *res = NULL;
+        int     floor;
+        vector<ElemType*>::iterator piter = __points.begin();
+        real    mindis = INVALID;
+        ElemType    *dest = (tp == Start? start : end);
+        bool    flag = (INVALID_ID == dest->id);
+
+        if ( flag )
+        {
+            floor = dest->floor;
+            while ( piter != __points.end() )
+            {
+                if ( FloorFromID((*piter)->id) != floor )
+                {
+                    ++piter;
+                    continue;
+                }
+                real dis = Distance(dest,*piter) ;//+ Distance(start,end);
+                if ( dis < mindis )
+                {
+                    mindis = dis;
+                    res = (*piter);
+                }
+                ++piter;
+            }
+
+        }else
+        {
+            res = _id2points[dest->id];
+        }
+        return res;
+
+    }
+//    ElemType *findNearTagPoint_End(ElemType *start,ElemType *end)
+//    {
+
+//        ElemType    *res = NULL;
+//        int     floor;
+//        vector<ElemType*>::iterator piter = __points.begin();
+//        real    mindis = INVALID;
+
+//        if ( INVALID_ID == end->id )
+//        {
+//            floor = end->floor;
+//            while ( piter != __points.end() )
+//            {
+//                if ( FloorFromID((*piter)->id) != floor )
+//                {
+//                    ++piter;
+//                    continue;
+//                }
+//                real dis = Distance(end,*piter);// + Distance(start,end);
+//                if ( dis < mindis )
+//                {
+//                    mindis = dis;
+//                    res = (*piter);
+//                }
+//                ++piter;
+//            }
+
+//        }else
+//        {
+//            res = _id2points[start->id];
+//        }
+//        return res;
+
+//    }
 
     ~ProcessRoadPoint()
     {
@@ -98,10 +167,10 @@ public:
 
 private:
 
-    vector<ElemType*>  __points;
+    vector<ElemType*>  &__points;
 
     //ID --Points对应表
-    map<int,ElemType*> _id2points;
+    map<int,ElemType*> &_id2points;
 };
 
 #endif // PROCESSROADPOINT_H
