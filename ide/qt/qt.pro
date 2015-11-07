@@ -6,8 +6,11 @@ CONFIG -= qt
 SOURCES += main.cpp \
     ../../src/common.cpp \
     ../../src/navigate.cpp \
-    ../../src/wifi_location.cpp \
-    ../../src/paka_api.cpp
+    ../../src/paka_api.cpp \
+    ../../src/guidance.cpp \
+    ../../src/location_master.cpp \
+    ../../src/rssi_location.cpp
+
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -15,8 +18,11 @@ qtcAddDeployment()
 HEADERS += \
     ../../src/common.h \
     ../../src/navigate.h \
-    ../../src/wifi_location.h \
-    ../../src/wifi_location_defines.h \
+    ../../src/navigate_defines.h \
     ../../src/paka_api.h \
-    ../../src/navigate_defines.h
+    ../../src/guidance.h \
+    ../../src/location_defines.h \
+    ../../src/location_master.h \
+    ../../src/rssi_location.h \
+    ../../src/processroadpoint.hpp
 
