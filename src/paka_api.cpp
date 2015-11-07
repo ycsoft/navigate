@@ -59,14 +59,11 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         nstart = global_nav.GetPoint(start->id);
     }
     nend = global_nav.GetPoint(end->id);
-<<<<<<< HEAD
     if ( nend == NULL )
     {
         cerr<<"目标点为空"<<endl;
         return result;
     }
-=======
->>>>>>> bab115615df97113820fc1fff2159802633a0579
 
     int stfloor = FloorFromID(nstart->id);
     int edfloor = FloorFromID(nend->id);
