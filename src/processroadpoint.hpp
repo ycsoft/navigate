@@ -26,7 +26,7 @@ template<typename ElemType>
 class ProcessRoadPoint
 {
 public:
-    explicit ProcessRoadPoint( map<int,ElemType*> data ,vector<Node*> pts)
+    explicit ProcessRoadPoint( map<int,ElemType*> data ,vector<ElemType*> pts)
     {
         __points = pts;
         _id2points = data;
