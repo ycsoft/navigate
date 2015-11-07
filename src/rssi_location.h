@@ -22,7 +22,7 @@ public:
     int LoadSignalFile(const char* filepath);
 
     // judge which floor am I
-    string LocationBuildingFloor(RealTimeSignal* realdata[], int size);
+    FloorBasicInfo LocationBuildingFloor(RealTimeSignal* realdata[], int size);
 
     // 根据不同的方法判断在哪个点
     LPoint LocationFloorPoint_SCM_11(const char* floor_code, RealTimeSignal* realdata[], int size);
@@ -73,14 +73,15 @@ private:
                                  map<string, MacListItem> &max_rssi_point_map);
 
 private:
-
     double calDistanceStandardDeviation(vector<CalTemp> &);
-
-    SPointTemp calMinDistancePoint(vector<SPointTemp> &points, double x, double y);
 
 private:
     // 保存楼宇中每个楼层的wifi数据
     map<string, FloorSignalInfo> m_building_signal_info;
+
+public:
+    // 对于输入的rssi指纹，包含相似指纹的点
+    vector<SPointTemp> m_sptl;
 
 };
 #endif // WIFI_LOCATION_H

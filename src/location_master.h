@@ -64,6 +64,12 @@ private:
     // 真实距离到像素
     void realDistanceToPixel(double rdx, double rdy, double *pdx, double *pdy);
 
+    // 得到一个离XY最近原始点
+    SPointTemp calMinDistancePoint(vector<SPointTemp> &points, double x, double y);
+
+    // 根据计算得到离XY最近的一个路上的点
+    SPointTemp calMinDistancePointInRoad(vector<SPointTemp> &points, double x0, double y0);
+
 public:
     // 比例尺, 从米到像素
     // 1米对应多少像素

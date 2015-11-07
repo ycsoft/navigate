@@ -1,5 +1,4 @@
-﻿
-#include "navigate.h"
+﻿#include "navigate.h"
 #include "paka_api.h"
 #include "rssi_location.h"
 #include "navigate_defines.h"
@@ -18,7 +17,6 @@ using namespace std;
 static Navigate global_nav;
 static RssiLocation global_wifi;
 static LocationMaster global_location;
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 路径规划
@@ -59,7 +57,6 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         nstart = global_nav.GetPoint(start->id);
     }
     nend = global_nav.GetPoint(end->id);
-
 
     int stfloor = FloorFromID(nstart->id);
     int edfloor = FloorFromID(nend->id);
@@ -111,10 +108,8 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
 // 路径规划结束
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 加入了惯性导航的室内定位
-
 bool initFloorLocationData(double scale, double nyAngle, const char *wifidatapath, const char *bledatapath)
 {
     return global_location.initData(scale, nyAngle, wifidatapath, bledatapath);
@@ -154,8 +149,10 @@ SidPoint doLocate(const char* bssids)
             count++;
         }
     }
-    string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
-    LPoint p = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
+
+    FloorBasicInfo floorinfo = global_wifi.LocationBuildingFloor(fingers, count);
+
+    LPoint p = global_wifi.LocationFloorPoint_SCM_11(floorinfo.floor_code.c_str(), fingers, count);
     SidPoint pp;
     pp.id = p.pcode;
     pp.x = p.x;
@@ -181,13 +178,13 @@ WifiMultiPoint doLocateTest(const char* bssids)
             count++;
         }
     }
-    string floor_code = global_wifi.LocationBuildingFloor(fingers, count);
+    FloorBasicInfo floorinfo = global_wifi.LocationBuildingFloor(fingers, count);
 
     // 不同的计算方式
-    LPoint p1 = global_wifi.LocationFloorPoint_SCM_11(floor_code.c_str(), fingers, count);
-    LPoint p2 = global_wifi.LocationFloorPoint_SCM_12(floor_code.c_str(), fingers, count);
-    LPoint p3 = global_wifi.LocationFloorPoint_SCM_21(floor_code.c_str(), fingers, count);
-    LPoint p4 = global_wifi.LocationFloorPoint_SCM_22(floor_code.c_str(), fingers, count);
+    LPoint p1 = global_wifi.LocationFloorPoint_SCM_11(floorinfo.floor_code.c_str(), fingers, count);
+    LPoint p2 = global_wifi.LocationFloorPoint_SCM_12(floorinfo.floor_code.c_str(), fingers, count);
+    LPoint p3 = global_wifi.LocationFloorPoint_SCM_21(floorinfo.floor_code.c_str(), fingers, count);
+    LPoint p4 = global_wifi.LocationFloorPoint_SCM_22(floorinfo.floor_code.c_str(), fingers, count);
 
     WifiMultiPoint ppp;
     memcpy(ppp.floor_code, p1.floor_code, strlen(p1.floor_code));

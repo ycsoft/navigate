@@ -206,11 +206,11 @@ int RssiLocation::addMacToAppearPointCodeMapList(string mac, int point_code, map
  * \param size 指纹个数
  * \return 楼层编号
  */
-string RssiLocation::LocationBuildingFloor(RealTimeSignal* fingers[], int size)
+FloorBasicInfo RssiLocation::LocationBuildingFloor(RealTimeSignal* fingers[], int size)
 {
     // 分别计算每一个楼层，取匹配数目最高
     // 遍历map
-    string max_matched_floor_code;
+    FloorBasicInfo ret;
     int max_matched = -1;
     map<string, FloorSignalInfo>::iterator iter = m_building_signal_info.begin();
     for ( ; iter != m_building_signal_info.end(); ++iter)
@@ -221,12 +221,12 @@ string RssiLocation::LocationBuildingFloor(RealTimeSignal* fingers[], int size)
         if (matched > max_matched)
         {
             max_matched = matched;
-            max_matched_floor_code = floor_code;
+            ret.floor_code = floor_code;
+            ret.floor_number = finfo.floor_number;
         }
     }
-    return max_matched_floor_code;
+    return ret;
 }
-
 
 /*!
  * \brief 计算传入的wifi指纹与楼层wifi列表的相似度
@@ -299,31 +299,30 @@ LPoint RssiLocation::LocationFloorPoint(const char* floor_code, RealTimeSignal* 
         // location error
         return p;
     }
-    FloorSignalInfo &floor_wifi_info = iter->second; // 楼层wifi
 
+    FloorSignalInfo &floor_wifi_info = iter->second; // 楼层wifi
     // 先挑选出可能的点，缩小比较范围
     set<int> possible_pcode_set = calPossiblePoints(realdata, size, floor_wifi_info.mac_point_code_map);
-
     // 得到按照相似度排列的点列表，可选择不同的相似度计算方式
-    vector<SPointTemp> sptl = getSimilarPointCodeList(realdata, size, floor_wifi_info.finger_map, possible_pcode_set, calType);
+    m_sptl = getSimilarPointCodeList(realdata, size, floor_wifi_info.finger_map, possible_pcode_set, calType);
 
     switch (calType) {
     case enum_simi_type_11:
     case enum_simi_type_21:
-        p = calFloorPointLocation(sptl);
+        // 这里仅仅只是求三点平均，得到XY点
+        p = calFloorPointLocation(m_sptl);
         break;
     case enum_simi_type_12:
     case enum_simi_type_22:
-        p =  calFloorPointLocation(realdata, size, sptl, floor_wifi_info.finger_map, floor_wifi_info.all_mac_map);
+        // 这里用比较复杂的方法，反正就是很复杂，我也不知道怎么回事
+        p = calFloorPointLocation(realdata, size, m_sptl, floor_wifi_info.finger_map, floor_wifi_info.all_mac_map);
     default:
         break;
     }
 
-    // 上面得到的只有XY坐标了，根据XY坐标，得到离哪个关键点最近
-    SPointTemp mindp = calMinDistancePoint(sptl, p.x, p.y);
-    p.pcode = mindp.pcode;
-    // 一些其他工作
-    p.pcode = floorPCodeToGlobePCode(p.pcode, floor_wifi_info.floor_number);
+    // 程序运行到这里，已经得到了XY
+    // 传递出去即可
+    p.floor_number = floor_wifi_info.floor_number;
     p.floor_code = floor_wifi_info.floor_code.c_str();
     return p;
 }
@@ -363,10 +362,12 @@ set<int> RssiLocation::calPossiblePoints(RealTimeSignal* realdata[], int size, m
     return ret;
 }
 
-
 /*!
- * \brief 计算传入的wifi数据与采集点指纹的相似度
+ * \brief 计算传入的wifi数据与采集点指纹的相似度，传出的Similarities结构中，包含三种相似度计算结果
+ *          不同方法计算出来的相似度
  *          方法1：仅比较mac地址是否匹配，匹配个数越多，相似度越高
+ *          方法2：第二种匹配规则
+ *          方法3：在方法二的基础上新增的匹配规则
  * \param fingers 传入的wifi data
  * \param size input wifi data length
  * \param ginfo gather point wifi info
@@ -382,7 +383,7 @@ Similarities RssiLocation::calSimilarityInFloorGatherCode(RealTimeSignal* realda
     }
 
     // 分别为三种方式求得的相似度
-    int s1 = 0; // 方法1，有匹配的mac地址则加1
+    int s1 = 0;      // 方法1，有匹配的mac地址则加1
     float s2 = 0.0f; // 方法2，有匹配的mac地址则加  1 - |((rssi_now - rssi_old) / rssi_old)|
     float s3 = 0.0f; // 方法3，在方法2的基础上 s3 = s2 * (now mac 顺序序号)^(-1/3)
 
@@ -400,11 +401,9 @@ Similarities RssiLocation::calSimilarityInFloorGatherCode(RealTimeSignal* realda
             s3 = s3 + calSimilarity_M3(f->rssi, item.rssi, i+1);
         }
     }
-
     ret.s1 = s1;
     ret.s2 = s2;
     ret.s3 = s3;
-
     return ret;
 }
 
@@ -546,6 +545,10 @@ vector<SPointTemp> RssiLocation::getSimilarPointCodeList(RealTimeSignal* fingers
 }
 
 
+
+
+
+
 /*!
  * \brief 得到最相似点后计算XY坐标
  * \param vecSpt 相似点，按相似度排序
@@ -579,10 +582,11 @@ LPoint RssiLocation::calFloorPointLocation(vector<SPointTemp> vecSpt)
 
 
 // 根据距离的排序函数
-bool disCompare(const CalTemp &arg1, const CalTemp &arg2)
+bool disCompareMaxToMin(const CalTemp &arg1, const CalTemp &arg2)
 {
     return arg1.d > arg2.d;
 }
+
 
 
 /*!
@@ -680,7 +684,7 @@ LPoint RssiLocation::calFloorPointLocation(RealTimeSignal *fingers[], int size, 
     // 如果i>3
     // 求出d1 d2 d3..di （xi,yi) (x0, y0)距离，并排序
     // 排序  大到小
-    sort(calTempVec.begin(), calTempVec.end(), disCompare);
+    sort(calTempVec.begin(), calTempVec.end(), disCompareMaxToMin);
 
     // 此时已排序好
     // 避免死循环
@@ -768,23 +772,6 @@ double RssiLocation::calDistanceStandardDeviation(vector<CalTemp> &data)
     double k2 = k / (float)n;
     double k3 = sqrt(k2);
     return k3;
-}
-
-SPointTemp RssiLocation::calMinDistancePoint(vector<SPointTemp> &points, double x, double y)
-{
-    SPointTemp ret;
-    double dmin = -99.0f;
-    for (int i = 0; i < (int)points.size(); ++i)
-    {
-        SPointTemp &item = points[i];
-        double d = calTwoPointDistance(item.x, item.y, x, y);
-        if (dmin < 0 || dmin > d)
-        {
-            dmin = d;
-            ret = points[i];
-        }
-    }
-    return ret;
 }
 
 
