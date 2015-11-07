@@ -50,7 +50,6 @@ void test_any(int x, int y, int floornumber, int id2)
     for (int i = 0; i < num; ++i) {
         NavPoint e = p[i];
         cout << e.id << " " << GetTips(e.attr) << endl;
-
     }
     cout<<endl;
 }
@@ -58,11 +57,9 @@ void test_any(int x, int y, int floornumber, int id2)
 
 void test_navigate() {
     //加载地图路径点文件
-    loadPathInfo("F:\\mg(xn).i2");
-
-    // test_any(1083, 590, 3, 30001);
-
-    test(30083,-10018);
+    loadPathInfo("F:\\_temp\\mg_xnrf.i2");
+    // test_any(800, 700, 1, 10249);
+    test(30083,30010);
     cout<<endl;
     /*
     //设置导航起点与终点
@@ -141,14 +138,19 @@ void test_guidance() {
 
 int main()
 {
-    test_guidance();
-    return 1;
+   //test_navigate();
+   //return 1;
    //test_wifi_location_read_file();
    //test_wifi_location_jduge_which_floor();
-   loadWifiInfo("F:\\_temp\\wfinger.f");
-   const char* bssids = "14759071f8b4,-44;bcd17798c642,-46;08107692b1a9,-48;20c9d0188cdc,-48;78d38dbcbc74,-55;9c216ae323a0,-55;80891724fed8,-59;78d38dbcbc78,-59;d0c7c00bbb5a,-59;54e6fc22046a,-59;202bc19f3639,-61;147590dc8346,-61;d0c7c08a440f,-79;b85510716928,-94;b85510716929,-94";
-   WifiMultiPoint pp = doLocateTest(bssids);
-   printf("%d", pp.id1);
+   // loadWifiInfo("F:\\_temp\\data\\wfinger_xnrf.f");
+   //const char* bssids = "14759071f8b4,-44;bcd17798c642,-46;08107692b1a9,-48;20c9d0188cdc,-48;78d38dbcbc74,-55;9c216ae323a0,-55;80891724fed8,-59;78d38dbcbc78,-59;d0c7c00bbb5a,-59;54e6fc22046a,-59;202bc19f3639,-61;147590dc8346,-61;d0c7c08a440f,-79;b85510716928,-94;b85510716929,-94";
+   const char* bssids = "882593775bcf,-42;88259339171e,-51;48022af67a2b,-57;1cfa68c0f916,-72;88259372ac80,-72;bcd17750b46e,-86";
+   // SidPoint pp = doLocate(bssids);
+   initFloorLocationData(1, 90, "F:\\_temp\\data\\wfinger_xnrf.f", 0);
+   SidPoint pp = doLocation(0, 0, 0, 0, 0, 0, 0, 0, bssids, 1, 3);
+   SidPoint pp2 = doLocation(pp.x, pp.y , 0.1, 0.2, 0.3, -32, 23, 43, "", 1, 2);
+
+   // printf("%d", pp.id1);
    //test_navigate();
    return 0;
 }

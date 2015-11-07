@@ -41,11 +41,13 @@ typedef struct _Point_Sid_ST
     double x;
     double y;
     int id;
+    int floor_number;
     char floor_code[LEN_FLOOR_CODE];
     _Point_Sid_ST() {
         x = -1.0f;
         y = -1.0f;
         id = -1;
+        floor_number = 0;
         memset(floor_code, 0, LEN_FLOOR_CODE);
     }
 } SidPoint;
@@ -109,17 +111,28 @@ typedef struct Gather_Finger_Item_ST {
 }GatherFingerItem, RealTimeSignal;
 
 typedef struct Point_ST {
+    int floor_number;
     int pcode;
     double x;
     double y;
     const char* floor_code;
     Point_ST() {
+        floor_number = 0;
         pcode = -1;
         x = -1.0f;
         y = -1.0f;
         floor_code = NULL;
     }
 } LPoint;
+
+// 楼层基本信息
+typedef struct FloorBasicInfo_ST {
+    string floor_code;
+    int floor_number;
+    FloorBasicInfo_ST() {
+        floor_number = 0;
+    }
+} FloorBasicInfo;
 
 // 相似度排序的时候，用到的临时结构体
 typedef struct Point_Similar_Temp_ST {
