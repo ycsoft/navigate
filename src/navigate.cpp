@@ -1,13 +1,18 @@
-﻿#include <assert.h>
+﻿
+
+#include <assert.h>
 #include <cstdio>
 #include <string.h>
 #include <cmath>
 
 
 #include "common.h"
+
 #include "navigate.h"
 #include "paka_api.h"
 #include "navigate_defines.h"
+
+#include "../../src/processroadpoint.hpp"
 
 Navigate::Navigate()
 {
@@ -123,6 +128,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     bool    bfinded = true;
     list<Node*> result;
+    list<Node*> finalResult;
     if ( start == NULL || end == NULL )
     {
         return result;
@@ -228,7 +234,12 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     _closeList.clear();
     _openList.clear();
     UpdateDirect(result);
-    return result;
+
+    //////////////////将路径端点的中间点加入，便于绘制实际路线/////////////////////
+    ProcessRoadPoint<Node> proc(_id2points,__points);
+    finalResult = proc.Process(result);
+
+    return finalResult;
 }
 
 

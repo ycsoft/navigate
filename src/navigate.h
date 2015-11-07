@@ -101,7 +101,15 @@ public:
     /// \param destfloor
     /// \return
     ///
+    ///
     //list<Node*> locateBinds(Node *src, int destfloor);
+
+    vector<int> &GetNei( int &id)
+    {
+        Node *nd = _id2points[id];
+        return nd->neigbours;
+    }
+
 protected:
     //ClearResult
     void ClearResult();
