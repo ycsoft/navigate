@@ -47,6 +47,13 @@ int main()
 
 //    NavPoint *pnav = GetPoint(20021);
 //    start = (pnav == NULL ? NavPoint():(*(pnav)));
+//    end.id = -1;
+    start.x += 1;
+    start.y += 1;
+    start.id = -1;
+    end.x += 1;
+    end.y += 1;
+    end.id=-1;
     PointArray results = getBestPath(&end,&start);
     int i = 0;
     for( ; i < results.num; i++)
