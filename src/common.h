@@ -52,14 +52,15 @@ bool    isInVector(T &value, vector<T> dest)
     return false;
 }
 
-//{
-//    list<Node>::iterator it = src.begin();
-//    while ( it != src.end() )
-//    {
-//        target.push_back(&(*it));
-//        ++it;
-//    }
-//}
+template<typename T1,typename T2>
+void typeTrans(T1 &to, const T2 &from)
+{
+    int flr = FloorFromID(from.id);
+    to.x        = from.x;
+    to.y        = from.y;
+    to.id       = from.id;
+    to.floor    = flr;
+}
 
 #endif // COMMON_H
 
