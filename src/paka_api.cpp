@@ -239,3 +239,9 @@ NavPoint *GetPoint(int id)
     return pt;
 }
 
+vector<int>& GetNeighor(int &id)
+
+{
+//    Node *nd = global_nav.GetPoint(id);
+    return global_nav.GetNei(id);
+}

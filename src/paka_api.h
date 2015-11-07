@@ -96,6 +96,7 @@ WifiMultiPoint doLocateTest(const char* bssids);
  * \return
  */
 PRIVATE NavPoint *GetPoint(int id);
+PRIVATE vector<int>& GetNeighor(int &id);
 
 
 #endif // NAVIGATELIB_H
