@@ -50,7 +50,7 @@
                                         (ID == Arrive ? "Arrive": \
                                         (ID == AlongLeft ? "AlongLeft": \
                                         (ID == CloseToU ? "CloseToU": \
-                                        (ID == AlongRight ? "AlongRight":"unknown")))))))))   \
+                                        (ID == AlongRight ? "AlongRight":"Middle Point")))))))))   \
                                    )
 
 #define     INVALID_ID             -1  //无效的点编号
@@ -99,6 +99,14 @@ typedef struct Node
 	{
 		//cout<<"Node Destroy"<<endl;
 	}
+    bool operator <( Node* nd)
+    {
+        return g < nd->g;
+    }
+    bool operator <(Node & nd)
+    {
+        return g<nd.g;
+    }
 
 	//坐标
 	real x;

@@ -1,4 +1,4 @@
-#ifndef COMMON_H
+﻿#ifndef COMMON_H
 #define COMMON_H
 
 #include <vector>
@@ -34,6 +34,33 @@ vector<string> split(string str, string pattern);
 // 计算两点距离
 double calTwoPointDistance(double x1, double y1, double x2, double y2);
 
+template<typename T>
+bool    isInVector(T &value, vector<T> dest)
+{
+    vector<T>::iterator iter = dest.begin();
+    while ( iter!=dest.end())
+    {
+        if ( (*iter) == value )
+        {
+//            printf("ID:%d Value=%d\n",*iter,value);
+            return true;
+        }else
+        {
+            ++iter;
+        }
+    }
+    return false;
+}
+
+template<typename T1,typename T2>
+void typeTrans(T1 &to, const T2 &from)
+{
+    int flr = FloorFromID(from.id);
+    to.x        = from.x;
+    to.y        = from.y;
+    to.id       = from.id;
+    to.floor    = flr;
+}
 
 #endif // COMMON_H
 

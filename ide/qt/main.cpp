@@ -1,7 +1,8 @@
 ﻿#include <iostream>
 
-#include "../../src/paka_api.h"
+#include "../../src/location_defines.h"
 #include "../../src/navigate_defines.h"
+#include "../../src/paka_api.h"
 
 using namespace std;
 
@@ -19,31 +20,47 @@ void outputFloors( PointArray paths )
         }
     }
 }
+void outputNeig( vector<int> &nei)
+{
+    cout<<" [ ";
+    for ( size_t i = 0 ; i < nei.size(); ++i)
+    {
+        cout<<nei[i]<<" ";
+    }
+    cout<<" ]";
+}
 
 int main()
 {
-    cout << "Hello World!" << endl;
-    PointArray paths = loadPathInfo("mg(916_2326).i2");
+
+    PointArray paths = loadPathInfo("mg(cross_floor).i2");
     outputFloors(paths);
 
-    NavPoint start =  paths.pts[0]
+    NavPoint start =  paths.pts[39]
             ,end =  paths.pts[20];
 
-//    start.x += 10;
-//    start.y += 5;
-//    start.id = -1;
-//    start.floor = 2;
-    end.x += 10;
-    end.y += 5;
-    end.id = -1;
-    end.floor = 3;
+    cout<<"Start id:"<<start.id<<"  End Id:"<<end.id<<endl;
+//    end.x += 10;
+//    end.y += 5;
+//    end.id = -1;
+//    end.floor = 3;
 
-    start = *(GetPoint(20021));
+//    NavPoint *pnav = GetPoint(20021);
+//    start = (pnav == NULL ? NavPoint():(*(pnav)));
+//    end.id = -1;
+    start.x += 1;
+    start.y += 1;
+    start.id = -1;
+    end.x += 1;
+    end.y += 1;
+    end.id=-1;
     PointArray results = getBestPath(&end,&start);
     int i = 0;
     for( ; i < results.num; i++)
     {
-        cout<<results.pts[i].id<<"\t"<<GetTips(results.pts[i].attr)<<endl;
+        cout<<results.pts[i].id<<"\t";
+        outputNeig(GetNeighor(results.pts[i].id));
+        cout<<GetTips(results.pts[i].attr)<<endl;
     }
     return 0;
 }
