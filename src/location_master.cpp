@@ -15,6 +15,8 @@ const double kMaxDiff = 5;
 const string kWifiFilename = "wfinger.f";
 const string kBleFilename = "bfinger.f";
 
+const int kRssiForceMaxCount = 4;
+
 LocationMaster::LocationMaster()
 {
     m_scale = 1;
@@ -22,6 +24,8 @@ LocationMaster::LocationMaster()
     m_last_floor_number = 0;
     m_lastPoint.x = -99.0f;
     m_lastPoint.y = -99.0f;
+
+    m_rssi_force_count = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +76,8 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
     // 根据蓝牙信号和WIFI信号进行定位
     if (cal_type == enum_pcal_type_location || cal_type == enum_pcal_type_forcelocation)
     {
+        m_rssi_force_count++;
+
         // wifi
         if (sig_type == enum_sigtype_wifi)
         {
@@ -83,15 +89,28 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
             ret = do_ble_location(signal_ids, enum_simi_type_22);
         }
 
+        if (cal_type == enum_pcal_type_location && m_rssi_force_count != kRssiForceMaxCount)
+        {
+            ret.x = (ret.x + m_lastPoint.x) / 2.0f;
+            ret.y = (ret.y + m_lastPoint.y) / 2.0f;
+        }
+
+        if (m_rssi_force_count >= kRssiForceMaxCount)
+        {
+            m_rssi_force_count = 0;
+        }
+
         // 保存楼层序号和自然楼层编号
         memcpy(&m_last_floor_code, ret.floor_code, LEN_FLOOR_CODE);
         m_last_floor_number = ret.floor_number;
+
+        /*
         if (cal_type == enum_pcal_type_location && m_lastPoint.x > 0.0f && m_lastPoint.y > 0.0f)
         {
             // 此处的XY已经是像素
             // 点校正
             // 1. 求新旧两点的像素距离
-            double dis = calTwoPointDistance(ret.x, ret.y, m_lastPoint.x, m_lastPoint.y);
+            // double dis = calTwoPointDistance(ret.x, ret.y, m_lastPoint.x, m_lastPoint.y);
             if (dis > kMaxDiff * m_scale)
             {
                 // 舍弃WIFI得到的点坐标
@@ -103,7 +122,15 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
                 ret.x = (ret.x + m_lastPoint.x) / 2.0f;
                 ret.y = (ret.y + m_lastPoint.y) / 2.0f;
             }
-        }
+
+        }*/
+
+        // 在这个地方，拉到路上
+        // 相似点列表为 rssi的public字段m_sptl
+        SPointTemp ppp = calMinDistancePointInRoad(m_wifi_location.m_sptl, ret.x, ret.y);
+        ret.x = ppp.x;
+        ret.y = ppp.y;
+        ret.id = ppp.pcode;
     }
     else // 惯性导航
     {
@@ -131,13 +158,6 @@ SidPoint LocationMaster::do_lacation_master(double x0, double y0,
         m_lastPoint.y = ret.y;
         m_lastPoint.floor_num = m_last_floor_number;
     }
-
-    // 在这个地方，拉到路上
-    // 相似点列表为 rssi的public字段m_sptl
-    SPointTemp ppp = calMinDistancePointInRoad(m_wifi_location.m_sptl, ret.x, ret.y);
-    ret.x = ppp.x;
-    ret.y = ppp.y;
-    ret.id = ppp.pcode;
     return ret;
 }
 

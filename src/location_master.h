@@ -90,6 +90,10 @@ private:
     char m_last_floor_code[LEN_FLOOR_CODE];
     int m_last_floor_number;
 
+    // 一般來講，對於每一次rssi的定位數據，都需要跟慣導的進行結合計算
+    // 但是，需要結合多少次之後，強制信任一次rssi定位
+    int m_rssi_force_count;
+
 };
 
 #endif // LOCATION_MASTER_H
