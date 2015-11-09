@@ -153,7 +153,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     list<Node*>  endNeighbor = GetNeighbor(end);
     if ( endNeighbor.size() < 1)
     {
-        cerr<<"目标点不可到达"<<endl;
+//        cerr<<"目标点不可到达"<<endl;
         return result;
     }
 
@@ -213,7 +213,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     if ( !bfinded ){
 
-        cout<<"Can not Find"<<endl;
+//        cout<<"Can not Find"<<endl;
         return result;
 
     }

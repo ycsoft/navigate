@@ -55,11 +55,10 @@ bool    isInVector(T &value, vector<T> dest)
 template<typename T1,typename T2>
 void typeTrans(T1 &to, const T2 &from)
 {
-    int flr = FloorFromID(from.id);
+    to.floor    = from.floor;
     to.x        = from.x;
     to.y        = from.y;
     to.id       = from.id;
-    to.floor    = flr;
 }
 
 #endif // COMMON_H
