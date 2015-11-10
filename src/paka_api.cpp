@@ -15,7 +15,7 @@
 
 using namespace std;
 
-static Navigate global_nav;
+static Navigate& global_nav = Navigate::ref();
 static RssiLocation global_wifi;
 static LocationMaster global_location;
 
@@ -25,8 +25,12 @@ PointArray loadPathInfo(const char *filepath)
 {
     global_nav.LoadPointsFile(filepath);
     vector<Node*> res = global_nav.GetAllPoints();
-    PointArray    result;
-
+    static PointArray    result;
+    if ( result.num > 0 )
+    {
+        delete [] result.pts;
+        result.num = 0;
+    }
     result.num = res.size();
     result.pts = new NavPoint[res.size()];
 
@@ -48,7 +52,11 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
 {
     Node *nstart = NULL, *nend = NULL;
     Node n1,n2;
-    PointArray result;
+    static PointArray result;
+    if ( result.num > 0)
+    {
+        delete [] result.pts;
+    }
     if ( start->id != INVALID_ID )
     {
         start->floor = FloorFromID(start->id);
@@ -63,7 +71,7 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     start->floor = n1.floor;
     end->floor = n2.floor;
     //判断传入的点是否为标记点，进行必要的定位起始点工作
-    ProcessRoadPoint<Node> proc(global_nav._id2points,global_nav.__points);
+    ProcessRoadPoint<Node> proc(global_nav._id2points,global_nav.__points,global_nav._floor_binds);
     nstart  = proc.findNearTagPoint(&n1,&n2,ProcessRoadPoint<Node>::Start);
     nend    = proc.findNearTagPoint(&n1,&n2,ProcessRoadPoint<Node>::End);
 
@@ -75,20 +83,31 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
 
     int stfloor = FloorFromID(nstart->id);
     int edfloor = FloorFromID(nend->id);
+    int sign = ( edfloor > stfloor ? 1:-1);
     list<Node*> path;
+
 
     if ( stfloor != edfloor )
     {
-        Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(nstart->id));
-        Node *dest2  = proc.getDestBindPoint(edfloor,dest1); //global_nav.getNearestBind(global_nav.GetPoint(nend->id));
-        if ( dest1 == NULL || dest2 == NULL )
+        list<Node*> ltmp;
+        Node        *dest1 = NULL;
+
+        dest1 = proc.getNearBindPointToFloor(edfloor,nstart);
+        if ( NULL == dest1)
         {
-//          cerr<<"无法到达目标点"<<endl;
+            dest1 = proc.getNearBindPointToFloor(stfloor + sign,nstart);
+        }
+        Node *dest2 ;
+        if ( dest1 == NULL  )
+        {
             return result;
         }
 
         list<Node*>  tmppath = global_nav.GetBestPath(nstart,dest1),
-                     tmppath2 = global_nav.GetBestPath(dest2,nend);
+                     tmppath2 = proc.getFloorPath(edfloor,dest1);//global_nav.GetBestPath(dest2,nend);
+        dest2 = tmppath2.back();
+        ltmp = global_nav.GetBestPath(dest2,nend);
+        listMerge(tmppath2,ltmp);
         if ( tmppath.empty() || tmppath2.empty() )
         {
             return result;
@@ -101,6 +120,10 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
         {
             path.push_back(*it);
             ++it;
+        }
+        if ( isInList(tmppath2.front(),tmppath) )
+        {
+            tmppath2.pop_front();
         }
         it = tmppath2.begin();
         while ( it != tmppath2.end() )
@@ -248,6 +271,7 @@ NavPoint *GetPoint(int id)
     pt->y = nd->y;
     pt->id = nd->id;
     pt->attr = nd->attr;
+    delete nd;
     return pt;
 }
 
