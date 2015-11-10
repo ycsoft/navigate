@@ -37,6 +37,8 @@ void outputNeig( vector<int> &nei)
 
 void unit_test(PointArray &paths, int id1,int id2)
 {
+//    Navigate::ref().LoadPointsFile("mg.i2");
+    paths = loadPathInfo("mg.i2");
     NavPoint start =  paths.pts[id1]
             ,end =  paths.pts[id2];
 
@@ -61,9 +63,9 @@ void unit_test(PointArray &paths, int id1,int id2)
 
 void suit_test()
 {
-    int testtimes = 1000;
+    int testtimes = 10000;
     srand(time(NULL));
-    PointArray paths = loadPathInfo("mg_sgt.i2");
+    PointArray paths = loadPathInfo("mg.i2");
     int count = paths.num;
     int i = 0;
     cout<<"Test Times:"<<testtimes;
@@ -84,8 +86,8 @@ int main()
 
     NavPoint start =  paths.pts[1]
             ,end =  paths.pts[200];
-    typeTrans(start,*(nav._id2points[10076]));
-    typeTrans(end,*(nav._id2points[20043]));
+    typeTrans(start,*(nav._id2points[10079]));
+    typeTrans(end,*(nav._id2points[30011]));
 
 
 
@@ -100,10 +102,11 @@ int main()
 //    end.id=-1;
     PointArray results = getBestPath(&start,&end);
     int i = 0;
+    cout<<"From:"<<start.id<<" To:"<<end.id<<endl;
     for( ; i < results.num; i++)
     {
         cout<<results.pts[i].id<<"\t";
-        outputNeig(GetNeighor(results.pts[i].id));
+//        outputNeig(GetNeighor(results.pts[i].id));
         cout<<GetTips(results.pts[i].attr)<<endl;
     }
         if( results.num <= 0 )
@@ -132,7 +135,8 @@ int main()
 //        cout<<"Can not find"<<endl;
 //    }
 
-//   suit_test();
+  suit_test();
+
     return 0;
 }
 
