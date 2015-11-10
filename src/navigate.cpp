@@ -12,7 +12,7 @@
 #include "paka_api.h"
 #include "navigate_defines.h"
 
-#include "../../src/processroadpoint.hpp"
+#include "processroadpoint.hpp"
 
 Navigate::Navigate()
 {
@@ -125,7 +125,7 @@ void Navigate::LoadPointsFile(const char *file)
 list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 {
     ClearResult();
-    bool    bfinded = true;
+    bool bfinded = true;
     list<Node*> result;
     list<Node*> finalResult;
     ProcessRoadPoint<Node> proc(_id2points,__points);
@@ -351,7 +351,7 @@ Node* Navigate::GetMiniFNode(Node *cur)
         {
             flag = true;
             minf = f;
-            //          res->parent = cur;
+            // res->parent = cur;
             res = (*iter);
         }
     }

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <list>
 #include <vector>
+#include <cmath>
 
 #define     ISEndian                1
 #define     NotEndian               0

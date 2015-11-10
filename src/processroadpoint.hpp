@@ -14,7 +14,6 @@ using namespace std;
 /**
  *使用模板做数据点的处理，防止日后对数据结构进行修改
  *而造成程序适配复杂
- *
  */
 
 template<typename ElemType>
@@ -47,7 +46,7 @@ public:
     list<ElemType*> Process(list<ElemType*> &result)
     {
         list<ElemType*> finalResult;
-        list<ElemType*>::iterator riter = result.begin();
+        typename list<ElemType*>::iterator riter = result.begin();
         ++riter;
         finalResult.push_back(*result.begin());
 
@@ -59,7 +58,7 @@ public:
             //扫描所有点，邻域点中同时包含pre和cur的点被添加进路径中
             //
             list<ElemType>   midpts;
-            vector<ElemType*> ::iterator viter = __points.begin();
+            typename vector<ElemType*> ::iterator viter = __points.begin();
             while( viter != __points.end() )
             {
                 if ( isInVector(pre->id,(*viter)->neigbours)
@@ -75,7 +74,7 @@ public:
             if ( midpts.size() > 0)
             {
                 midpts.sort();
-                list<ElemType>::iterator it = midpts.begin();
+                typename list<ElemType>::iterator it = midpts.begin();
                 while( it != midpts.end())
                 {
                     finalResult.push_back(_id2points[(*it).id]);
@@ -94,7 +93,7 @@ public:
 
         ElemType    *res = NULL;
         int     floor;
-        vector<ElemType*>::iterator piter = __points.begin();
+        typename vector<ElemType*>::iterator piter = __points.begin();
         real    mindis = INVALID;
         ElemType    *dest = (tp == Start? start : end);
         bool    flag = (INVALID_ID == dest->id);

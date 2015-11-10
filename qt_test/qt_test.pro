@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG += console
-CONFIG -= app_bundle
+# CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
@@ -19,5 +19,6 @@ HEADERS += \
     ../src/guidance.h \
     ../src/location_master.h \
     ../src/location_defines.h \
-    ../src/rssi_location.h
+    ../src/rssi_location.h \
+    ../src/processroadpoint.hpp
 

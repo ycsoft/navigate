@@ -35,14 +35,14 @@ vector<string> split(string str, string pattern);
 double calTwoPointDistance(double x1, double y1, double x2, double y2);
 
 template<typename T>
-bool    isInVector(T &value, vector<T> dest)
+bool isInVector(T &value, vector<T> dest)
 {
-    vector<T>::iterator iter = dest.begin();
+    typename vector<T>::iterator iter = dest.begin();
     while ( iter!=dest.end())
     {
         if ( (*iter) == value )
         {
-//            printf("ID:%d Value=%d\n",*iter,value);
+//          printf("ID:%d Value=%d\n",*iter,value);
             return true;
         }else
         {
