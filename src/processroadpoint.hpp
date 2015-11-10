@@ -52,7 +52,7 @@ public:
             return;
         }
         list<ElemType*>::iterator it = midpts.begin();
-        //TODO:解决路径中间点顺序问题
+        //ToDo:解决路径中间点顺序问题
     }
 
     list<ElemType*> Process(list<ElemType*> &result)
