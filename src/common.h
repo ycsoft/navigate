@@ -52,6 +52,24 @@ bool isInVector(T &value, vector<T> dest)
     return false;
 }
 
+template<typename T>
+bool isInList(T &value, list<T> dest)
+{
+    list<T>::iterator iter = dest.begin();
+    while ( iter!=dest.end())
+    {
+        if ( (*iter) == value )
+        {
+//          printf("ID:%d Value=%d\n",*iter,value);
+            return true;
+        }else
+        {
+            ++iter;
+        }
+    }
+    return false;
+}
+
 template<typename T1,typename T2>
 void typeTrans(T1 &to, const T2 &from)
 {
@@ -60,6 +78,31 @@ void typeTrans(T1 &to, const T2 &from)
     to.y        = from.y;
     to.id       = from.id;
 }
+
+
+template<typename T>
+void listMerge(list<T> &dest, list<T> &src)
+{
+
+    if ( src.empty() )
+    {
+        return;
+    }
+    T back = src.front();
+    if ( isInList(back,dest) )
+    {
+        src.pop_front();
+    }
+    list<T>::iterator it = src.begin();
+    while ( it != src.end() )
+    {
+        dest.push_back(*it);
+        ++it;
+    }
+}
+
+
+
 
 #endif // COMMON_H
 
