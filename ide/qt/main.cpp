@@ -84,8 +84,8 @@ int main()
 
     NavPoint start =  paths.pts[1]
             ,end =  paths.pts[200];
-    typeTrans(start,*(nav._id2points[20044]));
-    typeTrans(end,*(nav._id2points[10099]));
+    typeTrans(start,*(nav._id2points[10076]));
+    typeTrans(end,*(nav._id2points[20043]));
 
 
 
@@ -132,7 +132,7 @@ int main()
 //        cout<<"Can not find"<<endl;
 //    }
 
-   suit_test();
+//   suit_test();
     return 0;
 }
 
