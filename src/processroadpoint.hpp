@@ -63,7 +63,7 @@ public:
             {
                 if ( isInVector(pre->id,(*viter)->neigbours)
                      && isInVector(cur->id,(*viter)->neigbours)
-                     &&(*viter)->type == Navigate::Common)
+                     &&(*viter)->type == PtTyle_Common)
                 {
                     ElemType *nd = (*viter);
                     nd->g = Distance(nd,pre);
