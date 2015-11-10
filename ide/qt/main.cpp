@@ -7,11 +7,13 @@
 #include "../../src/paka_api.h"
 #include "../../src/navigate.h"
 #include "../../src/common.h"
+#include "../../src/navexception.hpp"
 
 using namespace std;
 
 void outputFloors( PointArray paths )
 {
+
     int i = 1,fl = FloorFromID(paths.pts[0].id);
     cout<<fl<<endl;
     for ( ; i < paths.num; ++i )
@@ -23,6 +25,7 @@ void outputFloors( PointArray paths )
             fl = cf;
         }
     }
+
 }
 void outputNeig( vector<int> &nei)
 {
@@ -37,7 +40,6 @@ void outputNeig( vector<int> &nei)
 
 void unit_test(PointArray &paths, int id1,int id2)
 {
-//    Navigate::ref().LoadPointsFile("mg.i2");
     paths = loadPathInfo("mg.i2");
     NavPoint start =  paths.pts[id1]
             ,end =  paths.pts[id2];
@@ -58,6 +60,7 @@ void unit_test(PointArray &paths, int id1,int id2)
     }else
     {
         cout<<"\t Fail!"<<endl;
+        system("pause");
     }
 }
 
@@ -78,35 +81,30 @@ void suit_test()
 int main()
 {
 
-    PointArray paths = loadPathInfo("mg_sgt.i2");
+    PointArray paths = loadPathInfo("mg.i2");
     Navigate nav;
-    nav.LoadPointsFile("mg_sgt.i2");
-
+    PointArray results;
+    nav.LoadPointsFile("mg.i2");
     outputFloors(paths);
 
-    NavPoint start =  paths.pts[1]
-            ,end =  paths.pts[200];
-    typeTrans(start,*(nav._id2points[10079]));
-    typeTrans(end,*(nav._id2points[30011]));
+    NavPoint start
+            ,end;
+    try
+    {
+        typeTrans(start,*(nav._id2points[20084]));
+        typeTrans(end,*(nav._id2points[40019]));
+        results = getBestPath(&start,&end);
+    }catch(NavException &nav)
+    {
+        cout<<nav.what()<<endl;
+        return EXIT_FAILURE;
+    }
 
-
-
-//    cout<<"Start id:"<<start.id<<"  End Id:"<<end.id<<endl;
-//    start.floor = FloorFromID(start.id);
-//    start.x += 1;
-//    start.y += 1;
-//    start.id = -1;
-//    end.floor = FloorFromID(end.id);
-//    end.x += 1;
-//    end.y += 1;
-//    end.id=-1;
-    PointArray results = getBestPath(&start,&end);
     int i = 0;
     cout<<"From:"<<start.id<<" To:"<<end.id<<endl;
     for( ; i < results.num; i++)
     {
         cout<<results.pts[i].id<<"\t";
-//        outputNeig(GetNeighor(results.pts[i].id));
         cout<<GetTips(results.pts[i].attr)<<endl;
     }
         if( results.num <= 0 )
@@ -114,29 +112,9 @@ int main()
             cout<<"Can not find"<<endl;
         }
 
-//    Navigate nav;
-//    nav.LoadPointsFile("mg_sgt.i2");
-//    Node *start = nav._id2points[10061];
-//    Node *end = nav._id2points[30022];
-//    list<Node*> res =  nav.GetBestPath(start,end);
-//    list<Node*>::iterator it = res.begin();
-
-//    NavPoint start = transT
-//            ,end =  paths.pts[200];
+  //suit_test();
 
 
-//    while ( it != res.end() )
-//    {
-//        cout<<(*it)->id<<endl;
-//        ++it;
-//    }
-//    if( res.empty() )
-//    {
-//        cout<<"Can not find"<<endl;
-//    }
-
-  suit_test();
-
-    return 0;
+    return EXIT_SUCCESS;
 }
 

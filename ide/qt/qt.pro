@@ -24,5 +24,6 @@ HEADERS += \
     ../../src/location_defines.h \
     ../../src/location_master.h \
     ../../src/rssi_location.h \
-    ../../src/processroadpoint.hpp
+    ../../src/processroadpoint.hpp \
+    ../../src/navexception.hpp
 
