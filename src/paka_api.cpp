@@ -63,7 +63,7 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     }
     if ( end->id != INVALID_ID )
     {
-        end->floor = FloorFromID(start->id);
+        end->floor = FloorFromID(end->id);
     }
     memset(&result,0,sizeof(PointArray));
     typeTrans(n1,*start);

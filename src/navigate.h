@@ -73,7 +73,7 @@ public:
         return _id2points[id];
     }
 
-    Node* FindTagPoint(void *start, void *end);
+//    Node* FindTagPoint(void *start, void *end);
     ///
     /// \brief GetAllPoints
     ///
@@ -92,7 +92,7 @@ public:
     /// \param nd
     /// \return
     ///
-    Node* getNearestBind(Node *nd);
+//    Node* getNearestBind(Node *nd);
 
     ///
     /// \brief locateBinds
@@ -142,7 +142,7 @@ protected:
     }
 
     //得到与选定点距离最近的路径点
-    Node  *GetNearPathNode( Node *nd);
+//    Node  *GetNearPathNode( Node *nd);
 
     //删除点
     void RemoveFromOpenList(Node *nd);

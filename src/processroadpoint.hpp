@@ -5,6 +5,7 @@
 #include "navigate_defines.h"
 #include "navigate.h"
 #include "location_defines.h"
+#include "common.h"
 
 #include <map>
 #include <list>
@@ -24,8 +25,8 @@ class ProcessRoadPoint
 public:
     //寻找点的依据，离起点近 or 离终点近
     enum  FindType{Start, End};
-    explicit ProcessRoadPoint( map<int,ElemType*> &data ,vector<ElemType*> &pts)
-        :__points(pts),_id2points(data)
+    explicit ProcessRoadPoint( map<int,ElemType*> &data ,vector<ElemType*> &pts,map<int,list<int> >  &floor_binds)
+        :__points(pts),_id2points(data),_floor_binds(floor_binds)
     {
 
     }
@@ -34,13 +35,24 @@ public:
     {
         __points = p.__points;
         _id2points = p._id2points;
+        _floor_binds = p._floor_binds;
     }
 
     ProcessRoadPoint& operator = ( ProcessRoadPoint &p)
     {
         __points = p.__points;
         _id2points = p._id2points;
+        _floor_binds = p._floor_binds;
         return *this;
+    }
+    void    sortMiddlePoint(ElemType *start,list<ElemType*> &midpts)
+    {
+        if ( midpts.empty())
+        {
+            return;
+        }
+        list<ElemType*>::iterator it = midpts.begin();
+        //TODO:解决路径中间点顺序问题
     }
 
     list<ElemType*> Process(list<ElemType*> &result)
@@ -90,6 +102,15 @@ public:
         return finalResult;
     }
 
+    /**
+     * @brief findNearTagPoint
+     * 在起点、终点间查询可作为导航起始点的路口点
+     *
+     * @param start
+     * @param end
+     * @param tp
+     * @return
+     */
     ElemType *findNearTagPoint(ElemType *start,ElemType *end,FindType tp)
     {
 
@@ -140,25 +161,163 @@ public:
         int sign = ((destfloor - curfloor) > 0 ? 1:-1);
         vector<int>  nbs = curpoint->neigbours;
         int floor = curfloor;
+        bool flag = false;
 
+        //在连接点邻域点中寻找下一楼层连接点
         while ( floor != destfloor)
         {
             floor += sign;
             for ( int i = 0 ; i < nbs.size(); ++i)
             {
                 ElemType *em = _id2points[nbs[i]];
-                if ( em -> type == PtTyle_Bind && FloorFromID(em->id) == destfloor)
+                if ( em -> type == PtType_Bind && FloorFromID(em->id) == destfloor)
                 {
                    return em;
                 }
-                else if ( em->type == PtTyle_Bind && FloorFromID(em->id) == floor)
+                else if ( em->type == PtType_Bind && FloorFromID(em->id) == floor)
                 {
                     nbs = em->neigbours;
+                    flag = true;
                     break;
                 }
             }
+            //邻域点中未找到至下一楼层的连接点，则在楼层内的所有点中寻找
+            if ( !bflag)
+            {
+
+            }
+
+
         }
         return NULL;
+    }
+
+    /**
+     * @brief getNextBind
+     * 计算tofloor中可与curpt互通的连接点
+     *
+     * @param tofloor
+     * @param curpt
+     * @return
+     */
+    ElemType *getBindInFloor(int tofloor, ElemType *curpt)
+    {
+        ElemType *res = NULL;
+        vector<int> nbs = curpt->neigbours;
+        //当前楼层的所有链接点
+        vector<int>::iterator liter = nbs.begin();
+        while ( liter != nbs.end())
+        {
+            if ( _id2points[*liter]->floor == tofloor)
+            {
+                res = _id2points[*liter];
+                return _id2points[*liter];
+            }
+            ++liter;
+        }
+
+    }
+
+    ElemType *getNearBindPointToFloor(int dflr, ElemType *curp)
+    {
+        int curflr = curp->floor;
+
+        if ( isDirectLinkWith(dflr,curp) )
+        {
+            return curp;
+        }
+        //all bind points in current floor
+        list<int> binds = _floor_binds[curflr];
+        list<int>::iterator liter = binds.begin();
+        real  mindis = INVALID;
+        ElemType *result = NULL;
+        //find nearest bind point to curp which can lead to dflr
+        while ( liter != binds.end() )
+        {
+
+            if ( isDirectLinkWith(dflr,_id2points[*liter]))
+            {
+                real dis = Distance(_id2points[*liter],curp);
+                if ( dis < mindis)
+                {
+                    mindis = dis;
+                    result = _id2points[*liter];
+                }
+            }
+            ++liter;
+        }
+        return result;
+    }
+    bool isDirectLinkWith(int flr,ElemType *curp)
+    {
+        if (curp->type == PtTyle_Bind )
+        {
+            vector<int> nbs = curp->neigbours;
+            vector<int>::iterator it = nbs.begin();
+            while ( it != nbs.end())
+            {
+                if ( _id2points[*it]->floor == flr )
+                {
+                    return true;
+                }
+                ++it;
+            }
+        }
+        return false;
+    }
+
+    list<ElemType*> getFloorPath(int destfloor, ElemType *curpoint)
+    {
+        int cfloor = curpoint->floor;
+        int sign = ( destfloor - cfloor > 0 ? 1: -1);
+        int floor = cfloor;
+        list<ElemType*>  results;
+
+        do{
+            //Specific elevator that direct to the destniation floor
+            // exists, we can go there directly
+            if( isDirectLinkWith(destfloor,curpoint))
+            {
+                curpoint->attr = sign * UpStairs;
+                results.push_back(curpoint);
+                ElemType *em = getBindInFloor(destfloor,curpoint);
+                results.push_back(em);
+                break;
+            }
+            //one floor at a time
+            floor  +=  sign;
+            ElemType *em = getNearBindPointToFloor(floor,curpoint);
+
+            if ( em == NULL )
+            {
+                cerr<<"Can not find Bind to next floor"<<endl;
+                results.clear();
+                return results;
+            }else
+            {
+                //find the bind point to next floor,now we shoud judge
+                //whether the point is different from the given point or no
+                //and then we can know if additional navigate are needed
+                if ( em == curpoint )
+                {
+                    results.push_back(em);
+                }else
+                {
+                    list<Node*> ret = Navigate::ref().GetBestPath(curpoint,em);
+                    ret.back()->attr = UpStairs * sign;
+                    listMerge(results,ret);
+                }
+                curpoint = getBindInFloor(floor,em);
+                if( floor == destfloor)
+                {
+                    results.push_back(curpoint);
+                }else{
+                    curpoint->attr = UpStairs*sign;
+                }
+            }
+
+        }while(floor != destfloor);
+        return results;
     }
 
     ~ProcessRoadPoint()
@@ -172,6 +331,8 @@ private:
 
     //ID --Points对应表
     map<int,ElemType*> &_id2points;
+
+    map<int,list<int> >  _floor_binds;
 };
 
 #endif // PROCESSROADPOINT_H

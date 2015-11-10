@@ -132,6 +132,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     //起点终点相同，不予导航
     if (start->id == end->id && start->id != INVALID_ID)
     {
+        result.push_back(start);
         return result;
     }
     //未给定路径，不予导航
@@ -440,102 +441,6 @@ void Navigate::UpdateDirect(list<Node *> &path)
         --iter;
         --iter;
     }
-}
-
-Node *Navigate::GetNearPathNode(Node *nd)
-{
-    Node *res = NULL;
-    if ( nd->type == PtTyle_Endian )
-    {
-        return nd;
-    }
-    else
-    {
-        int nbcount = nd->neighborcount;
-        real mindis = INVALID;
-        for ( int i = 0 ; i < nbcount ; ++i)
-        {
-            Node * nb = GetPoint(nd->neigbours[i]);
-            if ( nb->type != PtTyle_Endian )
-            {
-                continue;
-            }
-            real dis = Distance(_end,nb);
-            if ( dis < mindis )
-            {
-                mindis = dis;
-                res = nb;
-            }
-        }
-    }
-    return res;
-}
-
-Node *Navigate::getNearestBind(Node *ndsrc)
-{
-    real    mindis = INVALID;
-    int     floor = ndsrc->floor;
-    Node    *res = NULL;
-
-    if (_floor_binds.find(floor) == _floor_binds.end())
-    {
-        return NULL;
-    }
-
-    list<int> lbs = _floor_binds[floor];
-
-    list<int>::iterator it = lbs.begin();
-    while (it != lbs.end())
-    {
-        Node *nd = GetPoint(*it);
-        real dis = Distance(ndsrc,nd);
-        if ( dis <= mindis)
-        {
-            mindis = dis;
-            res = nd;
-        }
-        ++it;
-    }
-
-    return res;
-}
-
-Node *Navigate::FindTagPoint(void *st, void *ed)
-{
-    NavPoint *start = (NavPoint*)st;
-    NavPoint *end = (NavPoint*)ed;
-    Node    *res = NULL;
-    int     floor;
-    vector<Node*>::iterator piter = __points.begin();
-    real    mindis = INVALID;
-
-    if ( INVALID_ID == start->id )
-    {
-        floor = start->floor;
-        int i = 0;
-        while ( piter != __points.end() )
-        {
-            if ( FloorFromID((*piter)->id) != floor )
-            {
-                ++piter;
-                ++i;
-                continue;
-            }
-            real dis = Distance(start,*piter) + Distance(start,end);
-            if ( dis < mindis )
-            {
-                mindis = dis;
-                res = (*piter);
-            }
-            ++piter;
-            ++i;
-        }
-
-    }else
-    {
-        res = _id2points[start->id];
-    }
-    return res;
 }
 
 void Navigate::freeMemory()

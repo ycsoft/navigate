@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "navigate_defines.h"
+#include "navexception.hpp"
 
 using namespace std;
 
@@ -73,6 +74,11 @@ bool isInList(T &value, list<T> dest)
 template<typename T1,typename T2>
 void typeTrans(T1 &to, const T2 &from)
 {
+    if ( &from == NULL )
+    {
+        throw NavException("from is NULL in :typeTrans()");
+        return;
+    }
     to.floor    = from.floor;
     to.x        = from.x;
     to.y        = from.y;
