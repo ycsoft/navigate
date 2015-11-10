@@ -24,11 +24,11 @@ public:
         strcpy(msg,m);
     }
 
-    const char *what() const
+    const char *what() const throw()
     {
         return msg;
     }
-    ~NavException()
+    ~NavException() throw()
     {
 
 
