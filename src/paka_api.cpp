@@ -50,6 +50,14 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     Node *nstart = NULL, *nend = NULL;
     Node n1,n2;
     PointArray result;
+    if ( start->id != INVALID_ID )
+    {
+        start->floor = FloorFromID(start->id);
+    }
+    if ( end->id != INVALID_ID )
+    {
+        end->floor = FloorFromID(start->id);
+    }
     memset(&result,0,sizeof(PointArray));
     typeTrans(n1,*start);
     typeTrans(n2,*end);
@@ -73,15 +81,20 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     if ( stfloor != edfloor )
     {
         Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(nstart->id));
-        Node *dest2  = global_nav.getNearestBind(global_nav.GetPoint(nend->id));
+        Node *dest2  = proc.getDestBindPoint(edfloor,dest1);//global_nav.getNearestBind(global_nav.GetPoint(nend->id));
         if ( dest1 == NULL || dest2 == NULL )
         {
-            cerr<<"无法到达目标点"<<endl;
+//            cerr<<"无法到达目标点"<<endl;
             return result;
         }
 
         list<Node*>  tmppath = global_nav.GetBestPath(nstart,dest1),
                      tmppath2 = global_nav.GetBestPath(dest2,nend);
+        if ( tmppath.empty() || tmppath2.empty() )
+        {
+            return result;
+        }
+
         list<Node*>::iterator it = tmppath.begin();
         int  attr = (stfloor < edfloor ? 1:-1) * UpStairs;
         tmppath.back()->attr = attr;

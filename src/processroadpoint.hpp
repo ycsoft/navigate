@@ -3,7 +3,6 @@
 
 #include "location_defines.h"
 #include "navigate_defines.h"
-
 #include "navigate.h"
 
 #include <map>
@@ -124,40 +123,40 @@ public:
         return res;
 
     }
-//    ElemType *findNearTagPoint_End(ElemType *start,ElemType *end)
-//    {
 
-//        ElemType    *res = NULL;
-//        int     floor;
-//        vector<ElemType*>::iterator piter = __points.begin();
-//        real    mindis = INVALID;
+    /**
+     * @brief getDestBindPoint
+     * @param destfloor：目标楼层
+     * @param curpoint: 该点为楼层间连接点，否则会
+     * 导致无法找到需要导航的目标楼层连接点
+     *
+     * @return 需要导航到的目标楼层的楼层间连接点；
+     */
+    ElemType *getDestBindPoint(int destfloor,ElemType *curpoint)
+    {
+        int curfloor = FloorFromID(curpoint->id);
+        int sign = ((destfloor - curfloor) > 0 ? 1:-1);
+        vector<int>  nbs = curpoint->neigbours;
+        int floor = curfloor;
 
-//        if ( INVALID_ID == end->id )
-//        {
-//            floor = end->floor;
-//            while ( piter != __points.end() )
-//            {
-//                if ( FloorFromID((*piter)->id) != floor )
-//                {
-//                    ++piter;
-//                    continue;
-//                }
-//                real dis = Distance(end,*piter);// + Distance(start,end);
-//                if ( dis < mindis )
-//                {
-//                    mindis = dis;
-//                    res = (*piter);
-//                }
-//                ++piter;
-//            }
-
-//        }else
-//        {
-//            res = _id2points[start->id];
-//        }
-//        return res;
-
-//    }
+        while ( floor != destfloor)
+        {
+            floor += sign;
+            for ( int i = 0 ; i < nbs.size(); ++i)
+            {
+                ElemType *em = _id2points[nbs[i]];
+                if ( em -> type == Navigate::Bind && FloorFromID(em->id) == destfloor)
+                {
+                   return em;
+                }else if ( em->type == Navigate::Bind && FloorFromID(em->id) == floor)
+                {
+                    nbs = em->neigbours;
+                    break;
+                }
+            }
+        }
+        return NULL;
+    }
 
     ~ProcessRoadPoint()
     {
