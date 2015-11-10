@@ -153,16 +153,24 @@ public:
     vector<Node*>  __points;
     //ID --Points对应表
     map<int,Node*> _id2points;
+    map<int,list<int> >  _floor_binds;
+
+    static Navigate& ref()
+    {
+        static Navigate nav;
+        return nav;
+    }
+
 
 private:
 
-
+    void        freeMemory();
     //开放列表
     list<Node*>  _openList;
 
     //封闭列表
     list<Node*>  _closeList;
-    map<int,list<int> >  _floor_binds;
+
 
     //楼层间的连接点
     list<Node*>  _binds;
@@ -170,6 +178,8 @@ private:
     //起始点和终点
     Node*       _start;
     Node*       _end;
+    //
+
 
     int         _coordsys;
 };

@@ -173,5 +173,11 @@ enum PtTyle
     PtTyle_Endian,
     PtTyle_Bind,
 };
+enum PtType
+{
+    PtType_Common = 1,
+    PtType_Endian,
+    PtType_Bind,
+};
 
 #endif // NAVIGATE_DEFINES_H

@@ -21,14 +21,7 @@ Navigate::Navigate()
 
 Navigate::~Navigate()
 {
-    vector<Node*>::iterator ptiter= __points.begin();
-
-    while ( ptiter != __points.end() )
-    {
-        delete *ptiter;
-        ptiter = __points.erase(ptiter);
-    }
-
+    freeMemory();
     ClearResult();
 }
 
@@ -48,6 +41,7 @@ list<Node*> Navigate::GetNeighbor(Node *center)
 void Navigate::LoadPointsFile(const char *file)
 {
 
+    freeMemory();
     //二进制文件读取
     FILE *f = fopen(file,"rb");
     char buf[32] = {0};
@@ -125,10 +119,11 @@ void Navigate::LoadPointsFile(const char *file)
 list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 {
     ClearResult();
+    int curfloor = start->floor;
     bool bfinded = true;
     list<Node*> result;
     list<Node*> finalResult;
-    ProcessRoadPoint<Node> proc(_id2points,__points);
+    ProcessRoadPoint<Node> proc(_id2points,__points,_floor_binds);
     if ( start == NULL || end == NULL )
     {
         return result;
@@ -162,7 +157,10 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
 
     for ( ; iter != neighbor.end(); ++iter)
     {
-        AddToOpenList( start,*iter );
+        if( (*iter)->floor == curfloor)
+        {
+            AddToOpenList( start,*iter );
+        }
     }
     AddToCloseList( start );
     Node *nstart = start;
@@ -268,19 +266,6 @@ void Navigate::ClearResult()
 {
     _openList.clear();
     _closeList.clear();
-    //    list<Node*> ::iterator it1 = _openList.begin();
-    //    while ( it1 != _openList.end())
-    //    {
-    //        delete *it1;
-    //        it1 = _openList.erase(it1);
-    //    }
-
-    //    list<Node*> ::iterator it2 = _closeList.begin();
-    //    while ( it2!= _closeList.end() )
-    //    {
-    //        delete *it2;
-    //        it2 = _closeList.erase(it2);
-    //    }
 }
 
 real Navigate::GetGValue(Node *n1, Node *n2)
@@ -483,23 +468,6 @@ Node *Navigate::GetNearPathNode(Node *nd)
             }
         }
     }
-
-    //    real mindis = INVALID;
-    //    Node *res = NULL;
-    //    int i = 0, count = __points.size();
-    //    for ( i = 0 ; i < count; ++i)
-    //    {
-    //        if (__points[i]->type == Endian)
-    //        {
-    //            real dis = Distance(nd,__points[i]);
-    //            if ( dis < mindis)
-    //            {
-    //                mindis = dis;
-    //                res = __points[i];
-    //            }
-    //        }
-
-    //    }
     return res;
 }
 
@@ -568,4 +536,23 @@ Node *Navigate::FindTagPoint(void *st, void *ed)
         res = _id2points[start->id];
     }
     return res;
+}
+
+void Navigate::freeMemory()
+{
+    vector<Node*>::iterator it = __points.begin();
+    if ( __points.empty() )
+    {
+        return;
+    }
+    cout<<"Free Memory"<<endl;
+    while ( it != __points.end() )
+    {
+        delete *(it++);
+    }
+    __points.clear();
+    _id2points.clear();
+    _floor_binds.clear();
+    _binds.clear();
+
 }
