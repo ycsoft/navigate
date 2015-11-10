@@ -15,16 +15,26 @@ public:
 
     NavException():exception()
     {
+        memset(msg,0,MaxMsgLen);
+        strcpy(msg,"NavException");
     }
 
-    NavException(const char *m):exception( m )
+    NavException(const char *m):exception()
     {
+        strcpy(msg,m);
     }
 
+    const char *what() const
+    {
+        return msg;
+    }
     ~NavException()
     {
 
+
     }
+private:
+    char        msg[MaxMsgLen];
 };
 
 #endif // NAVEXCEPTION_H
