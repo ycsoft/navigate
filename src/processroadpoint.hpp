@@ -147,50 +147,7 @@ public:
         return res;
     }
 
-    /**
-     * @brief getDestBindPoint
-     * @param destfloor：目标楼层
-     * @param curpoint: 该点为楼层间连接点，否则会
-     * 导致无法找到需要导航的目标楼层连接点
-     *
-     * @return 需要导航到的目标楼层的楼层间连接点；
-     */
-    ElemType *getDestBindPoint(int destfloor, ElemType *curpoint)
-    {
-        int curfloor = FloorFromID(curpoint->id);
-        int sign = ((destfloor - curfloor) > 0 ? 1:-1);
-        vector<int>  nbs = curpoint->neigbours;
-        int floor = curfloor;
-        bool flag = false;
 
-        //在连接点邻域点中寻找下一楼层连接点
-        while ( floor != destfloor)
-        {
-            floor += sign;
-            for ( int i = 0 ; i < nbs.size(); ++i)
-            {
-                ElemType *em = _id2points[nbs[i]];
-                if ( em -> type == PtType_Bind && FloorFromID(em->id) == destfloor)
-                {
-                   return em;
-                }
-                else if ( em->type == PtType_Bind && FloorFromID(em->id) == floor)
-                {
-                    nbs = em->neigbours;
-                    flag = true;
-                    break;
-                }
-            }
-            //邻域点中未找到至下一楼层的连接点，则在楼层内的所有点中寻找
-            if ( !bflag)
-            {
-
-            }
-
-
-        }
-        return NULL;
-    }
 
     /**
      * @brief getNextBind
