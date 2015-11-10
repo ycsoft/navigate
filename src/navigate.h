@@ -16,7 +16,6 @@ class Navigate
 public:
     typedef Node Vec;
     friend class ProcessRoadPoint<Node>;
-    enum PtTyle {Common = 1,Endian,Bind};
     Navigate();
     ~Navigate();
 

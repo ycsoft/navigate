@@ -21,7 +21,6 @@ static LocationMaster global_location;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 路径规划
-
 PointArray loadPathInfo(const char *filepath)
 {
     global_nav.LoadPointsFile(filepath);
@@ -81,10 +80,10 @@ PointArray getBestPath(NavPoint *start, NavPoint *end)
     if ( stfloor != edfloor )
     {
         Node *dest1  = global_nav.getNearestBind(global_nav.GetPoint(nstart->id));
-        Node *dest2  = proc.getDestBindPoint(edfloor,dest1);//global_nav.getNearestBind(global_nav.GetPoint(nend->id));
+        Node *dest2  = proc.getDestBindPoint(edfloor,dest1); //global_nav.getNearestBind(global_nav.GetPoint(nend->id));
         if ( dest1 == NULL || dest2 == NULL )
         {
-//            cerr<<"无法到达目标点"<<endl;
+//          cerr<<"无法到达目标点"<<endl;
             return result;
         }
 

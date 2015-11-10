@@ -167,4 +167,11 @@ typedef struct SortValue
     Node *res;
 }SortValue;
 
+enum PtTyle
+{
+    PtTyle_Common = 1,
+    PtTyle_Endian,
+    PtTyle_Bind,
+};
+
 #endif // NAVIGATE_DEFINES_H

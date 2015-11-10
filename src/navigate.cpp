@@ -111,7 +111,7 @@ void Navigate::LoadPointsFile(const char *file)
             _id2points[nd->id] = nd;
             __points.push_back(nd);
 
-            if ( nd->type == Bind )
+            if ( nd->type == PtTyle_Bind )
             {
                 _binds.push_back(nd);
                 lnd.push_back(nd->id);
@@ -212,8 +212,7 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     }
 
     if ( !bfinded ){
-
-//        cout<<"Can not Find"<<endl;
+//      cout<<"Can not Find"<<endl;
         return result;
 
     }
@@ -238,21 +237,19 @@ list<Node*> Navigate::GetBestPath(Node *start, Node *end)
     //////////////////将路径端点的中间点加入，便于绘制实际路线/////////////////////
 
     finalResult = proc.Process(result);
-
     return finalResult;
 }
-
 
 
 void Navigate::AddToCloseList(Node *center)
 {
     //    Node *nd = new Node;
-
     //    memcpy(nd,center,sizeof(Node));
     //    nd->parent = center->parent;
     //    _closeList.push_front(nd);
     _closeList.push_front(center);
 }
+
 //为尽可能简化程序，提高运行效率
 //该方法认为要添加的点在开放集中不存在，直接添加
 void Navigate::AddToOpenList(Node *parent,Node *center)
@@ -463,7 +460,7 @@ void Navigate::UpdateDirect(list<Node *> &path)
 Node *Navigate::GetNearPathNode(Node *nd)
 {
     Node *res = NULL;
-    if ( nd->type == Endian )
+    if ( nd->type == PtTyle_Endian )
     {
         return nd;
     }
@@ -474,7 +471,7 @@ Node *Navigate::GetNearPathNode(Node *nd)
         for ( int i = 0 ; i < nbcount ; ++i)
         {
             Node * nb = GetPoint(nd->neigbours[i]);
-            if ( nb->type != Endian )
+            if ( nb->type != PtTyle_Endian )
             {
                 continue;
             }

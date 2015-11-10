@@ -1,9 +1,10 @@
 ﻿#ifndef PROCESSROADPOINT_H
 #define PROCESSROADPOINT_H
 
-#include "location_defines.h"
+
 #include "navigate_defines.h"
 #include "navigate.h"
+#include "location_defines.h"
 
 #include <map>
 #include <list>
@@ -16,13 +17,13 @@ using namespace std;
  */
 
 template<typename ElemType>
-
 class ProcessRoadPoint
 {
     friend class Navigate;
+
 public:
     //寻找点的依据，离起点近 or 离终点近
-    enum  FindType{ Start, End};
+    enum  FindType{Start, End};
     explicit ProcessRoadPoint( map<int,ElemType*> &data ,vector<ElemType*> &pts)
         :__points(pts),_id2points(data)
     {
@@ -87,14 +88,15 @@ public:
         }
         return finalResult;
     }
+
     ElemType *findNearTagPoint(ElemType *start,ElemType *end,FindType tp)
     {
 
-        ElemType    *res = NULL;
-        int     floor;
+        ElemType *res = NULL;
+        int floor;
         typename vector<ElemType*>::iterator piter = __points.begin();
-        real    mindis = INVALID;
-        ElemType    *dest = (tp == Start? start : end);
+        real mindis = INVALID;
+        ElemType *dest = (tp == Start? start : end);
         bool    flag = (INVALID_ID == dest->id);
 
         if ( flag )
@@ -121,7 +123,6 @@ public:
             res = _id2points[dest->id];
         }
         return res;
-
     }
 
     /**
@@ -132,7 +133,7 @@ public:
      *
      * @return 需要导航到的目标楼层的楼层间连接点；
      */
-    ElemType *getDestBindPoint(int destfloor,ElemType *curpoint)
+    ElemType *getDestBindPoint(int destfloor, ElemType *curpoint)
     {
         int curfloor = FloorFromID(curpoint->id);
         int sign = ((destfloor - curfloor) > 0 ? 1:-1);
@@ -145,10 +146,11 @@ public:
             for ( int i = 0 ; i < nbs.size(); ++i)
             {
                 ElemType *em = _id2points[nbs[i]];
-                if ( em -> type == Navigate::Bind && FloorFromID(em->id) == destfloor)
+                if ( em -> type == PtTyle_Bind && FloorFromID(em->id) == destfloor)
                 {
                    return em;
-                }else if ( em->type == Navigate::Bind && FloorFromID(em->id) == floor)
+                }
+                else if ( em->type == PtTyle_Bind && FloorFromID(em->id) == floor)
                 {
                     nbs = em->neigbours;
                     break;
