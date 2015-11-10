@@ -62,7 +62,8 @@ public:
             while( viter != __points.end() )
             {
                 if ( isInVector(pre->id,(*viter)->neigbours)
-                     && isInVector(cur->id,(*viter)->neigbours))
+                     && isInVector(cur->id,(*viter)->neigbours)
+                     &&(*viter)->type == Navigate::Common)
                 {
                     ElemType *nd = (*viter);
                     nd->g = Distance(nd,pre);
