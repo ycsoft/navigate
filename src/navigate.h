@@ -2,8 +2,6 @@
 #define NAVIGATE_H
 
 #include "navigate_defines.h"
-#include "processroadpoint.hpp"
-
 #include <vector>
 #include <list>
 #include <map>
@@ -15,7 +13,6 @@ class Navigate
 {
 public:
     typedef Node Vec;
-    friend class ProcessRoadPoint<Node>;
     Navigate();
     ~Navigate();
 

@@ -20,8 +20,6 @@ using namespace std;
 template<typename ElemType>
 class ProcessRoadPoint
 {
-    friend class Navigate;
-
 public:
     //寻找点的依据，离起点近 or 离终点近
     enum  FindType{Start, End};
